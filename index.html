@@ -466,6 +466,9 @@
         function closeModal() {
             document.getElementById('alert-modal').style.display = 'none';
         }
+  if ('serviceWorker' in navigator) {
+    navigator.serviceWorker.register('/sw.js');
+}
     </script>
 </body>
 </html>
