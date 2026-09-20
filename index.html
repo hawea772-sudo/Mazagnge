@@ -246,7 +246,7 @@
             cursor: pointer;
         }
 
-        /* --- لوحة التعديل (Admin Dashboard) --- */
+        /* --- لوحة التعديل --- */
         #admin-panel {
             display: none;
             position: fixed;
@@ -334,7 +334,7 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- مكان عرض المنتجات الديناميكي -->
+    <!-- عرض الاصناف بأسعارها وإمكانية زيادة الكمية -->
     <div id="products-container"></div>
 
     <!-- بيانات التوصيل -->
@@ -358,7 +358,7 @@
         <button class="send-btn" onclick="sendOrder()">إرسال الطلب 💬</button>
     </div>
 
-    <!-- --- لوحة التحكم والتعديل --- -->
+    <!-- --- لوحة التحكم وتغيير الرقم --- -->
     <div id="admin-panel">
         <div class="admin-header">
             <h2>⚙️ لوحة تحكم التطبيق</h2>
@@ -388,7 +388,6 @@
     </div>
 
     <script>
-        // إخفاء المقدمة
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const intro = document.getElementById('intro-screen');
@@ -400,7 +399,7 @@
             renderProducts();
         });
 
-        // البيانات الافتراضية
+        // الاصناف الافتراضية للعميل
         let defaultProducts = [
             {
                 name: "لب أسود",
@@ -543,7 +542,6 @@
             window.open(`https://wa.me/${whatsappPhone}?text=${orderText}`, '_blank');
         }
 
-        /* --- وظائف لوحة التحكم --- */
         function openAdminLogin() {
             const pass = prompt("أدخل كلمة سر لوحة التحكم:");
             if (pass === "1234") {
