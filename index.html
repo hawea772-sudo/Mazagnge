@@ -32,13 +32,11 @@
             direction: rtl;
         }
 
-        /* --- شاشة المقدمة الاحترافية --- */
+        /* --- شاشة المقدمة --- */
         #intro-screen {
             position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
             background-color: #0d0d0d;
             display: flex;
             flex-direction: column;
@@ -58,7 +56,6 @@
         .intro-main-text {
             font-size: 2.2rem;
             font-weight: 800;
-            color: #f39c12;
             background: linear-gradient(135deg, #f1c40f, #f39c12, #e67e22);
             -webkit-background-clip: text;
             -webkit-text-fill-color: transparent;
@@ -69,7 +66,6 @@
             font-size: 1.6rem;
             font-weight: bold;
             color: #ffffff;
-            letter-spacing: 1px;
             border-right: 2px solid var(--accent-color);
             padding-right: 10px;
         }
@@ -86,16 +82,15 @@
             50% { opacity: 1; transform: scale(1.03); }
         }
 
-        @keyframes fadeIn {
-            to { opacity: 1; }
-        }
+        @keyframes fadeIn { to { opacity: 1; } }
 
-        /* --- بقية تنسيقات التطبيق --- */
+        /* --- الهيدر والأزرار --- */
         header {
             text-align: center;
             padding: 15px 0;
             border-bottom: 1px solid var(--border-color);
             margin-bottom: 20px;
+            position: relative;
         }
 
         header h1 {
@@ -109,6 +104,17 @@
             margin-top: 5px;
         }
 
+        .admin-trigger {
+            position: absolute;
+            left: 0; top: 10px;
+            background: transparent;
+            border: none;
+            color: var(--border-color);
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        /* --- المنتجات --- */
         .product-card {
             background: var(--card-bg);
             border-radius: 12px;
@@ -132,13 +138,7 @@
             border-bottom: 1px solid #2a2a2a;
         }
 
-        .size-row:last-child {
-            border-bottom: none;
-        }
-
-        .size-info {
-            font-size: 0.95rem;
-        }
+        .size-row:last-child { border-bottom: none; }
 
         .size-price {
             color: var(--accent-color);
@@ -160,21 +160,15 @@
             background: var(--accent-color);
             color: #000;
             border: none;
-            width: 26px;
-            height: 26px;
+            width: 26px; height: 26px;
             border-radius: 6px;
             font-weight: bold;
             font-size: 1.1rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+            display: flex; align-items: center; justify-content: center;
         }
 
-        .qty-btn.minus {
-            background: #444;
-            color: #fff;
-        }
+        .qty-btn.minus { background: #444; color: #fff; }
 
         .qty-count {
             font-size: 1rem;
@@ -186,15 +180,11 @@
         .section-title {
             font-size: 1.1rem;
             margin: 20px 0 10px 0;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            display: flex; align-items: center; gap: 8px;
             color: var(--accent-color);
         }
 
-        .input-group {
-            margin-bottom: 12px;
-        }
+        .input-group { margin-bottom: 12px; }
 
         .input-group label {
             display: block;
@@ -222,10 +212,7 @@
             border-radius: 8px;
             font-size: 0.95rem;
             cursor: pointer;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
+            display: flex; align-items: center; justify-content: center; gap: 8px;
             margin-bottom: 15px;
         }
 
@@ -243,11 +230,6 @@
             margin-top: 20px;
         }
 
-        .total-price {
-            font-size: 1.1rem;
-            font-weight: bold;
-        }
-
         .total-price span {
             color: var(--accent-color);
             font-size: 1.3rem;
@@ -262,9 +244,47 @@
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
+        }
+
+        /* --- لوحة التعديل (Admin Dashboard) --- */
+        #admin-panel {
+            display: none;
+            position: fixed;
+            top: 0; left: 0; width: 100vw; height: 100vh;
+            background: #121212;
+            z-index: 10000;
+            padding: 20px;
+            overflow-y: auto;
+        }
+
+        .admin-header {
             display: flex;
+            justify-content: space-between;
             align-items: center;
-            gap: 8px;
+            border-bottom: 1px solid var(--border-color);
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+
+        .save-admin-btn {
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            padding: 10px 18px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            width: 100%;
+            margin-top: 15px;
+        }
+
+        .close-admin-btn {
+            background: #e74c3c;
+            color: #fff;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 6px;
+            cursor: pointer;
         }
 
         .modal {
@@ -272,9 +292,8 @@
             position: fixed;
             top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.8);
-            justify-content: center;
-            align-items: center;
-            z-index: 1000;
+            justify-content: center; align-items: center;
+            z-index: 10001;
         }
 
         .modal-content {
@@ -300,7 +319,7 @@
 </head>
 <body>
 
-    <!-- الشاشة الافتتاحية عند فتح التطبيق -->
+    <!-- الشاشة الافتتاحية -->
     <div id="intro-screen">
         <div class="intro-title-container">
             <span class="intro-main-text">على كيفك</span>
@@ -310,105 +329,13 @@
     </div>
 
     <header>
+        <button class="admin-trigger" onclick="openAdminLogin()">⚙️</button>
         <h1>لُبّ - Labb</h1>
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- لب أسود -->
-    <div class="product-card" data-product="لب أسود">
-        <div class="product-title">لب أسود</div>
-        
-        <div class="size-row">
-            <div class="size-info">ربع كيلو <span class="size-price">(300 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أسود', 'ربع كيلو', 300, -1)">-</button>
-                <span class="qty-count" id="qty-لب أسود-ربع كيلو">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أسود', 'ربع كيلو', 300, 1)">+</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <div class="size-info">نص كيلو <span class="size-price">(600 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أسود', 'نص كيلو', 600, -1)">-</button>
-                <span class="qty-count" id="qty-لب أسود-نص كيلو">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أسود', 'نص كيلو', 600, 1)">+</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <div class="size-info">كيلو كامل <span class="size-price">(1200 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أسود', 'كيلو كامل', 1200, -1)">-</button>
-                <span class="qty-count" id="qty-لب أسود-كيلو كامل">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أسود', 'كيلو كامل', 1200, 1)">+</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- لب أصفر -->
-    <div class="product-card" data-product="لب أصفر">
-        <div class="product-title">لب أصفر</div>
-        
-        <div class="size-row">
-            <div class="size-info">ربع كيلو <span class="size-price">(300 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أصفر', 'ربع كيلو', 300, -1)">-</button>
-                <span class="qty-count" id="qty-لب أصفر-ربع كيلو">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أصفر', 'ربع كيلو', 300, 1)">+</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <div class="size-info">نص كيلو <span class="size-price">(600 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أصفر', 'نص كيلو', 600, -1)">-</button>
-                <span class="qty-count" id="qty-لب أصفر-نص كيلو">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أصفر', 'نص كيلو', 600, 1)">+</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <div class="size-info">كيلو كامل <span class="size-price">(1200 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أصفر', 'كيلو كامل', 1200, -1)">-</button>
-                <span class="qty-count" id="qty-لب أصفر-كيلو كامل">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أصفر', 'كيلو كامل', 1200, 1)">+</button>
-            </div>
-        </div>
-    </div>
-
-    <!-- لب أبيض فاخر -->
-    <div class="product-card" data-product="لب أبيض فاخر">
-        <div class="product-title">لب أبيض فاخر</div>
-        
-        <div class="size-row">
-            <div class="size-info">ربع كيلو <span class="size-price">(300 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أبيض فاخر', 'ربع كيلو', 300, -1)">-</button>
-                <span class="qty-count" id="qty-لب أبيض فاخر-ربع كيلو">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أبيض فاخر', 'ربع كيلو', 300, 1)">+</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <div class="size-info">نص كيلو <span class="size-price">(600 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أبيض فاخر', 'نص كيلو', 600, -1)">-</button>
-                <span class="qty-count" id="qty-لب أبيض فاخر-نص كيلو">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أبيض فاخر', 'نص كيلو', 600, 1)">+</button>
-            </div>
-        </div>
-
-        <div class="size-row">
-            <div class="size-info">كيلو كامل <span class="size-price">(1200 ج)</span></div>
-            <div class="qty-controls">
-                <button class="qty-btn minus" onclick="updateQty('لب أبيض فاخر', 'كيلو كامل', 1200, -1)">-</button>
-                <span class="qty-count" id="qty-لب أبيض فاخر-كيلو كامل">0</span>
-                <button class="qty-btn" onclick="updateQty('لب أبيض فاخر', 'كيلو كامل', 1200, 1)">+</button>
-            </div>
-        </div>
-    </div>
+    <!-- مكان عرض المنتجات الديناميكي -->
+    <div id="products-container"></div>
 
     <!-- بيانات التوصيل -->
     <div class="section-title">👤 بيانات التوصيل</div>
@@ -425,10 +352,31 @@
 
     <button class="location-btn" id="location-btn" onclick="getLocation()">📍 تحديد الموقع تلقائياً...</button>
 
-    <!-- الفوتر مع إجمالي الحساب وزر الواتساب -->
+    <!-- الفوتر مع الإجمالي والواتساب -->
     <div class="footer-cart">
         <div class="total-price">إجمالي الحساب: <br><span id="total-val">0</span> جنيه</div>
         <button class="send-btn" onclick="sendOrder()">إرسال الطلب 💬</button>
+    </div>
+
+    <!-- --- لوحة التحكم والتعديل --- -->
+    <div id="admin-panel">
+        <div class="admin-header">
+            <h2>⚙️ لوحة تحكم التطبيق</h2>
+            <button class="close-admin-btn" onclick="closeAdmin()">إغلاق ✖</button>
+        </div>
+
+        <div class="input-group">
+            <label style="color: var(--accent-color); font-size: 1rem; font-weight: bold;">📱 رقم الواتساب لاستلام الطلبات:</label>
+            <input type="text" id="admin-phone" placeholder="مثال: 201012345678 (بدون +)">
+            <small style="color:#888; display:block; margin-top:4px;">اكتب الرقم برمز الدولة (مثال لمصر: 2010...)</small>
+        </div>
+
+        <hr style="border-color: var(--border-color); margin: 20px 0;">
+
+        <h3 style="margin-bottom: 15px; color: var(--accent-color);">📦 تعديل الأسعار والمنتجات:</h3>
+        <div id="admin-products-editor"></div>
+
+        <button class="save-admin-btn" onclick="saveAdminChanges()">💾 حفظ التغييرات وتحديث التطبيق</button>
     </div>
 
     <!-- التنبيهات -->
@@ -440,7 +388,7 @@
     </div>
 
     <script>
-        // إخفاء المقدمة تلقائياً بعد ثانيتين ونصف
+        // إخفاء المقدمة
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const intro = document.getElementById('intro-screen');
@@ -449,10 +397,73 @@
                     intro.style.visibility = 'hidden';
                 }
             }, 2200);
+            renderProducts();
         });
+
+        // البيانات الافتراضية
+        let defaultProducts = [
+            {
+                name: "لب أسود",
+                sizes: [
+                    { name: "ربع كيلو", price: 300 },
+                    { name: "نص كيلو", price: 600 },
+                    { name: "كيلو كامل", price: 1200 }
+                ]
+            },
+            {
+                name: "لب أصفر",
+                sizes: [
+                    { name: "ربع كيلو", price: 300 },
+                    { name: "نص كيلو", price: 600 },
+                    { name: "كيلو كامل", price: 1200 }
+                ]
+            },
+            {
+                name: "لب أبيض فاخر",
+                sizes: [
+                    { name: "ربع كيلو", price: 300 },
+                    { name: "نص كيلو", price: 600 },
+                    { name: "كيلو كامل", price: 1200 }
+                ]
+            }
+        ];
+
+        let whatsappPhone = localStorage.getItem('labb_phone') || '201000000000';
+        let productsData = JSON.parse(localStorage.getItem('labb_products')) || defaultProducts;
 
         let cart = {};
         let userLocation = '';
+
+        function renderProducts() {
+            const container = document.getElementById('products-container');
+            container.innerHTML = '';
+
+            productsData.forEach((prod, prodIdx) => {
+                let cardHtml = `
+                    <div class="product-card">
+                        <div class="product-title">${prod.name}</div>
+                `;
+
+                prod.sizes.forEach((sz, szIdx) => {
+                    const key = `${prod.name} - ${sz.name}`;
+                    const currentQty = cart[key] ? cart[key].qty : 0;
+
+                    cardHtml += `
+                        <div class="size-row">
+                            <div class="size-info">${sz.name} <span class="size-price">(${sz.price} ج)</span></div>
+                            <div class="qty-controls">
+                                <button class="qty-btn minus" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, -1)">-</button>
+                                <span class="qty-count" id="qty-${prodIdx}-${szIdx}">${currentQty}</span>
+                                <button class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, 1)">+</button>
+                            </div>
+                        </div>
+                    `;
+                });
+
+                cardHtml += `</div>`;
+                container.innerHTML += cardHtml;
+            });
+        }
 
         function updateQty(product, size, price, change) {
             const key = `${product} - ${size}`;
@@ -465,12 +476,10 @@
 
             if (cart[key].qty <= 0) {
                 delete cart[key];
-                document.getElementById(`qty-${product}-${size}`).innerText = '0';
-            } else {
-                document.getElementById(`qty-${product}-${size}`).innerText = cart[key].qty;
             }
 
             calculateTotal();
+            renderProducts();
         }
 
         function calculateTotal() {
@@ -531,9 +540,73 @@
 
             orderText += `%0A*الإجمالي:* ${total} جنيه`;
 
-            // استبدل هذا الرقم برقم الواتساب الخاص بك
-            const phone = "201000000000"; 
-            window.open(`https://wa.me/${phone}?text=${orderText}`, '_blank');
+            window.open(`https://wa.me/${whatsappPhone}?text=${orderText}`, '_blank');
+        }
+
+        /* --- وظائف لوحة التحكم --- */
+        function openAdminLogin() {
+            const pass = prompt("أدخل كلمة سر لوحة التحكم:");
+            if (pass === "1234") {
+                document.getElementById('admin-phone').value = whatsappPhone;
+                renderAdminEditor();
+                document.getElementById('admin-panel').style.display = 'block';
+            } else if (pass !== null) {
+                showAlert("كلمة السر غير صحيحة!");
+            }
+        }
+
+        function closeAdmin() {
+            document.getElementById('admin-panel').style.display = 'none';
+        }
+
+        function renderAdminEditor() {
+            const editor = document.getElementById('admin-products-editor');
+            editor.innerHTML = '';
+
+            productsData.forEach((prod, pIdx) => {
+                let html = `
+                    <div style="background:#1e1e1e; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #333;">
+                        <label style="color:#aaa; font-size:0.8rem;">اسم المنتج:</label>
+                        <input type="text" value="${prod.name}" id="prod-name-${pIdx}" style="width:100%; padding:8px; margin-bottom:8px; background:#2a2a2a; color:#fff; border:1px solid #444; border-radius:4px;">
+                `;
+
+                prod.sizes.forEach((sz, sIdx) => {
+                    html += `
+                        <div style="display:flex; gap:8px; margin-bottom:5px;">
+                            <input type="text" value="${sz.name}" id="sz-name-${pIdx}-${sIdx}" style="flex:2; padding:6px; background:#2a2a2a; color:#fff; border:1px solid #444; border-radius:4px;">
+                            <input type="number" value="${sz.price}" id="sz-price-${pIdx}-${sIdx}" style="flex:1; padding:6px; background:#2a2a2a; color:#fff; border:1px solid #444; border-radius:4px;">
+                        </div>
+                    `;
+                });
+
+                html += `</div>`;
+                editor.innerHTML += html;
+            });
+        }
+
+        function saveAdminChanges() {
+            const newPhone = document.getElementById('admin-phone').value.trim();
+            if (newPhone) {
+                whatsappPhone = newPhone;
+                localStorage.setItem('labb_phone', whatsappPhone);
+            }
+
+            productsData.forEach((prod, pIdx) => {
+                const newName = document.getElementById(`prod-name-${pIdx}`).value;
+                if (newName) prod.name = newName;
+
+                prod.sizes.forEach((sz, sIdx) => {
+                    const szName = document.getElementById(`sz-name-${pIdx}-${sIdx}`).value;
+                    const szPrice = document.getElementById(`sz-price-${pIdx}-${sIdx}`).value;
+                    if (szName) sz.name = szName;
+                    if (szPrice) sz.price = parseFloat(szPrice);
+                });
+            });
+
+            localStorage.setItem('labb_products', JSON.stringify(productsData));
+            renderProducts();
+            closeAdmin();
+            showAlert("✅ تم حفظ التغييرات وتحديث التطبيق بنجاح!");
         }
 
         function showAlert(msg) {
