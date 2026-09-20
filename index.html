@@ -334,7 +334,7 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- مكان عرض الأصناف -->
+    <!-- عرض الاصناف بأسعارها وإمكانية زيادة الكمية -->
     <div id="products-container"></div>
 
     <!-- بيانات التوصيل -->
@@ -361,7 +361,7 @@
     <!-- --- لوحة التحكم وتغيير الرقم --- -->
     <div id="admin-panel">
         <div class="admin-header">
-            <h2>⚙️ لوحة تحكم التطبيق</h2>
+            <h2>⚙️ إعدادات الواتساب</h2>
             <button class="close-admin-btn" onclick="closeAdmin()">إغلاق ✖</button>
         </div>
 
@@ -371,12 +371,7 @@
             <small style="color:#888; display:block; margin-top:4px;">اكتب الرقم برمز الدولة (مثال لمصر: 2010...)</small>
         </div>
 
-        <hr style="border-color: var(--border-color); margin: 20px 0;">
-
-        <h3 style="margin-bottom: 15px; color: var(--accent-color);">📦 تعديل الأسعار والمنتجات:</h3>
-        <div id="admin-products-editor"></div>
-
-        <button class="save-admin-btn" onclick="saveAdminChanges()">💾 حفظ التغييرات وتحديث التطبيق</button>
+        <button class="save-admin-btn" onclick="saveAdminChanges()">💾 حفظ رقم الواتساب</button>
     </div>
 
     <!-- التنبيهات -->
@@ -388,46 +383,6 @@
     </div>
 
     <script>
-        // قائمة الأصناف الأساسية الثابتة
-        const defaultProducts = [
-            {
-                name: "لب أسود",
-                sizes: [
-                    { name: "ربع كيلو", price: 300 },
-                    { name: "نص كيلو", price: 600 },
-                    { name: "كيلو كامل", price: 1200 }
-                ]
-            },
-            {
-                name: "لب أصفر",
-                sizes: [
-                    { name: "ربع كيلو", price: 300 },
-                    { name: "نص كيلو", price: 600 },
-                    { name: "كيلو كامل", price: 1200 }
-                ]
-            },
-            {
-                name: "لب أبيض فاخر",
-                sizes: [
-                    { name: "ربع كيلو", price: 300 },
-                    { name: "نص كيلو", price: 600 },
-                    { name: "كيلو كامل", price: 1200 }
-                ]
-            }
-        ];
-
-        let whatsappPhone = localStorage.getItem('labb_phone') || '201000000000';
-        let productsData = JSON.parse(localStorage.getItem('labb_products'));
-
-        // إصلاح مشكلة اختفاء الأصناف والذاكرة القديمة
-        if (!productsData || !Array.isArray(productsData) || productsData.length === 0) {
-            productsData = defaultProducts;
-            localStorage.setItem('labb_products', JSON.stringify(productsData));
-        }
-
-        let cart = {};
-        let userLocation = '';
-
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const intro = document.getElementById('intro-screen');
@@ -438,6 +393,38 @@
             }, 2200);
             renderProducts();
         });
+
+        // الاصناف الثابتة الأصيلة
+        const productsData = [
+            {
+                name: "لب أسود",
+                sizes: [
+                    { name: "ربع كيلو", price: 30 },
+                    { name: "نص كيلو", price: 60 },
+                    { name: "كيلو كامل", price: 120 }
+                ]
+            },
+            {
+                name: "لب أصفر",
+                sizes: [
+                    { name: "ربع كيلو", price: 30 },
+                    { name: "نص كيلو", price: 60 },
+                    { name: "كيلو كامل", price: 120 }
+                ]
+            },
+            {
+                name: "لب أبيض فاخر",
+                sizes: [
+                    { name: "ربع كيلو", price: 40 },
+                    { name: "نص كيلو", price: 80 },
+                    { name: "كيلو كامل", price: 160 }
+                ]
+            }
+        ];
+
+        let whatsappPhone = localStorage.getItem('labb_phone') || '201000000000';
+        let cart = {};
+        let userLocation = '';
 
         function renderProducts() {
             const container = document.getElementById('products-container');
@@ -552,7 +539,6 @@
             const pass = prompt("أدخل كلمة سر لوحة التحكم:");
             if (pass === "1234") {
                 document.getElementById('admin-phone').value = whatsappPhone;
-                renderAdminEditor();
                 document.getElementById('admin-panel').style.display = 'block';
             } else if (pass !== null) {
                 showAlert("كلمة السر غير صحيحة!");
@@ -563,54 +549,16 @@
             document.getElementById('admin-panel').style.display = 'none';
         }
 
-        function renderAdminEditor() {
-            const editor = document.getElementById('admin-products-editor');
-            editor.innerHTML = '';
-
-            productsData.forEach((prod, pIdx) => {
-                let html = `
-                    <div style="background:#1e1e1e; padding:10px; margin-bottom:10px; border-radius:8px; border:1px solid #333;">
-                        <label style="color:#aaa; font-size:0.8rem;">اسم المنتج:</label>
-                        <input type="text" value="${prod.name}" id="prod-name-${pIdx}" style="width:100%; padding:8px; margin-bottom:8px; background:#2a2a2a; color:#fff; border:1px solid #444; border-radius:4px;">
-                `;
-
-                prod.sizes.forEach((sz, sIdx) => {
-                    html += `
-                        <div style="display:flex; gap:8px; margin-bottom:5px;">
-                            <input type="text" value="${sz.name}" id="sz-name-${pIdx}-${sIdx}" style="flex:2; padding:6px; background:#2a2a2a; color:#fff; border:1px solid #444; border-radius:4px;">
-                            <input type="number" value="${sz.price}" id="sz-price-${pIdx}-${sIdx}" style="flex:1; padding:6px; background:#2a2a2a; color:#fff; border:1px solid #444; border-radius:4px;">
-                        </div>
-                    `;
-                });
-
-                html += `</div>`;
-                editor.innerHTML += html;
-            });
-        }
-
         function saveAdminChanges() {
             const newPhone = document.getElementById('admin-phone').value.trim();
             if (newPhone) {
                 whatsappPhone = newPhone;
                 localStorage.setItem('labb_phone', whatsappPhone);
+                showAlert("✅ تم حفظ رقم الواتساب بنجاح!");
+                closeAdmin();
+            } else {
+                showAlert("برجاء إدخال الرقم بطريقة صحيحة");
             }
-
-            productsData.forEach((prod, pIdx) => {
-                const newName = document.getElementById(`prod-name-${pIdx}`).value;
-                if (newName) prod.name = newName;
-
-                prod.sizes.forEach((sz, sIdx) => {
-                    const szName = document.getElementById(`sz-name-${pIdx}-${sIdx}`).value;
-                    const szPrice = document.getElementById(`sz-price-${pIdx}-${sIdx}`).value;
-                    if (szName) sz.name = szName;
-                    if (szPrice) sz.price = parseFloat(szPrice);
-                });
-            });
-
-            localStorage.setItem('labb_products', JSON.stringify(productsData));
-            renderProducts();
-            closeAdmin();
-            showAlert("✅ تم حفظ التغييرات وتحديث التطبيق بنجاح!");
         }
 
         function showAlert(msg) {
