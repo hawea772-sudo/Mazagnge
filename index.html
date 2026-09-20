@@ -246,7 +246,7 @@
             cursor: pointer;
         }
 
-        /* --- لوحة التعديل --- */
+        /* --- لوحة التحكم وتغيير الرقم --- */
         #admin-panel {
             display: none;
             position: fixed;
@@ -334,7 +334,7 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- عرض الاصناف بأسعارها وإمكانية زيادة الكمية -->
+    <!-- مكان عرض الأصناف -->
     <div id="products-container"></div>
 
     <!-- بيانات التوصيل -->
@@ -388,19 +388,8 @@
     </div>
 
     <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const intro = document.getElementById('intro-screen');
-                if (intro) {
-                    intro.style.opacity = '0';
-                    intro.style.visibility = 'hidden';
-                }
-            }, 2200);
-            renderProducts();
-        });
-
-        // الاصناف الافتراضية للعميل
-        let defaultProducts = [
+        // قائمة الأصناف الأساسية الثابتة
+        const defaultProducts = [
             {
                 name: "لب أسود",
                 sizes: [
@@ -428,10 +417,27 @@
         ];
 
         let whatsappPhone = localStorage.getItem('labb_phone') || '201000000000';
-        let productsData = JSON.parse(localStorage.getItem('labb_products')) || defaultProducts;
+        let productsData = JSON.parse(localStorage.getItem('labb_products'));
+
+        // إصلاح مشكلة اختفاء الأصناف والذاكرة القديمة
+        if (!productsData || !Array.isArray(productsData) || productsData.length === 0) {
+            productsData = defaultProducts;
+            localStorage.setItem('labb_products', JSON.stringify(productsData));
+        }
 
         let cart = {};
         let userLocation = '';
+
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const intro = document.getElementById('intro-screen');
+                if (intro) {
+                    intro.style.opacity = '0';
+                    intro.style.visibility = 'hidden';
+                }
+            }, 2200);
+            renderProducts();
+        });
 
         function renderProducts() {
             const container = document.getElementById('products-container');
