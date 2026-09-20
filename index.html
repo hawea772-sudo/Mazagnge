@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
-   <link rel="manifest" href="/manifest.json"> 
+ <link rel="manifest" href="/manifest.json">  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لُبّ - Labb | أسهل طريقة لطلب التسالي</title>
     <meta name="theme-color" content="#121212">
+    <link rel="manifest" href="/manifest.json">
     <style>
         :root {
             --bg-color: #121212;
@@ -65,34 +66,63 @@
             color: #fff;
         }
 
-        .size-options {
+        .size-row {
             display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #2a2a2a;
+        }
+
+        .size-row:last-child {
+            border-bottom: none;
+        }
+
+        .size-info {
+            font-size: 0.95rem;
+        }
+
+        .size-price {
+            color: var(--accent-color);
+            font-weight: bold;
+            font-size: 0.9rem;
+        }
+
+        .qty-controls {
+            display: flex;
+            align-items: center;
             gap: 10px;
-        }
-
-        .size-btn {
-            flex: 1;
-            padding: 10px 5px;
             background: #2a2a2a;
-            border: 1px solid var(--border-color);
-            color: var(--text-color);
+            padding: 4px 8px;
             border-radius: 8px;
-            text-align: center;
-            cursor: pointer;
-            transition: all 0.2s ease;
+            border: 1px solid var(--border-color);
         }
 
-        .size-btn.active {
+        .qty-btn {
             background: var(--accent-color);
             color: #000;
+            border: none;
+            width: 26px;
+            height: 26px;
+            border-radius: 6px;
             font-weight: bold;
-            border-color: var(--accent-color);
+            font-size: 1.1rem;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
-        .size-btn .price {
-            font-size: 0.85rem;
-            margin-top: 4px;
-            opacity: 0.9;
+        .qty-btn.minus {
+            background: #444;
+            color: #fff;
+        }
+
+        .qty-count {
+            font-size: 1rem;
+            font-weight: bold;
+            min-width: 18px;
+            text-align: center;
         }
 
         .section-title {
@@ -115,7 +145,7 @@
             margin-bottom: 5px;
         }
 
-        .input-group input, .input-group textarea {
+        .input-group input {
             width: 100%;
             padding: 12px;
             background: var(--card-bg);
@@ -217,48 +247,98 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- المنتجات الثلاثة فقط -->
+    <!-- لب أسود -->
     <div class="product-card" data-product="لب أسود">
         <div class="product-title">لب أسود</div>
-        <div class="size-options">
-            <div class="size-btn" data-size="ربع كيلو" data-price="300" onclick="selectSize(this)">
-                ربع كيلو<div class="price">300 ج</div>
+        
+        <div class="size-row">
+            <div class="size-info">ربع كيلو <span class="size-price">(300 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أسود', 'ربع كيلو', 300, -1)">-</button>
+                <span class="qty-count" id="qty-لب أسود-ربع كيلو">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أسود', 'ربع كيلو', 300, 1)">+</button>
             </div>
-            <div class="size-btn" data-size="نص كيلو" data-price="600" onclick="selectSize(this)">
-                نص كيلو<div class="price">600 ج</div>
+        </div>
+
+        <div class="size-row">
+            <div class="size-info">نص كيلو <span class="size-price">(600 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أسود', 'نص كيلو', 600, -1)">-</button>
+                <span class="qty-count" id="qty-لب أسود-نص كيلو">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أسود', 'نص كيلو', 600, 1)">+</button>
             </div>
-            <div class="size-btn" data-size="كيلو كامل" data-price="1200" onclick="selectSize(this)">
-                كيلو كامل<div class="price">1200 ج</div>
+        </div>
+
+        <div class="size-row">
+            <div class="size-info">كيلو كامل <span class="size-price">(1200 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أسود', 'كيلو كامل', 1200, -1)">-</button>
+                <span class="qty-count" id="qty-لب أسود-كيلو كامل">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أسود', 'كيلو كامل', 1200, 1)">+</button>
             </div>
         </div>
     </div>
 
+    <!-- لب أصفر -->
     <div class="product-card" data-product="لب أصفر">
         <div class="product-title">لب أصفر</div>
-        <div class="size-options">
-            <div class="size-btn" data-size="ربع كيلو" data-price="300" onclick="selectSize(this)">
-                ربع كيلو<div class="price">300 ج</div>
+        
+        <div class="size-row">
+            <div class="size-info">ربع كيلو <span class="size-price">(300 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أصفر', 'ربع كيلو', 300, -1)">-</button>
+                <span class="qty-count" id="qty-لب أصفر-ربع كيلو">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أصفر', 'ربع كيلو', 300, 1)">+</button>
             </div>
-            <div class="size-btn" data-size="نص كيلو" data-price="600" onclick="selectSize(this)">
-                نص كيلو<div class="price">600 ج</div>
+        </div>
+
+        <div class="size-row">
+            <div class="size-info">نص كيلو <span class="size-price">(600 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أصفر', 'نص كيلو', 600, -1)">-</button>
+                <span class="qty-count" id="qty-لب أصفر-نص كيلو">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أصفر', 'نص كيلو', 600, 1)">+</button>
             </div>
-            <div class="size-btn" data-size="كيلو كامل" data-price="1200" onclick="selectSize(this)">
-                كيلو كامل<div class="price">1200 ج</div>
+        </div>
+
+        <div class="size-row">
+            <div class="size-info">كيلو كامل <span class="size-price">(1200 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أصفر', 'كيلو كامل', 1200, -1)">-</button>
+                <span class="qty-count" id="qty-لب أصفر-كيلو كامل">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أصفر', 'كيلو كامل', 1200, 1)">+</button>
             </div>
         </div>
     </div>
 
+    <!-- لب أبيض فاخر -->
     <div class="product-card" data-product="لب أبيض فاخر">
         <div class="product-title">لب أبيض فاخر</div>
-        <div class="size-options">
-            <div class="size-btn" data-size="ربع كيلو" data-price="300" onclick="selectSize(this)">
-                ربع كيلو<div class="price">300 ج</div>
+        
+        <div class="size-row">
+            <div class="size-info">ربع كيلو <span class="size-price">(300 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أبيض فاخر', 'ربع كيلو', 300, -1)">-</button>
+                <span class="qty-count" id="qty-لب أبيض فاخر-ربع كيلو">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أبيض فاخر', 'ربع كيلو', 300, 1)">+</button>
             </div>
-            <div class="size-btn" data-size="نص كيلو" data-price="600" onclick="selectSize(this)">
-                نص كيلو<div class="price">600 ج</div>
+        </div>
+
+        <div class="size-row">
+            <div class="size-info">نص كيلو <span class="size-price">(600 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أبيض فاخر', 'نص كيلو', 600, -1)">-</button>
+                <span class="qty-count" id="qty-لب أبيض فاخر-نص كيلو">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أبيض فاخر', 'نص كيلو', 600, 1)">+</button>
             </div>
-            <div class="size-btn" data-size="كيلو كامل" data-price="1200" onclick="selectSize(this)">
-                كيلو كامل<div class="price">1200 ج</div>
+        </div>
+
+        <div class="size-row">
+            <div class="size-info">كيلو كامل <span class="size-price">(1200 ج)</span></div>
+            <div class="qty-controls">
+                <button class="qty-btn minus" onclick="updateQty('لب أبيض فاخر', 'كيلو كامل', 1200, -1)">-</button>
+                <span class="qty-count" id="qty-لب أبيض فاخر-كيلو كامل">0</span>
+                <button class="qty-btn" onclick="updateQty('لب أبيض فاخر', 'كيلو كامل', 1200, 1)">+</button>
             </div>
         </div>
     </div>
@@ -296,21 +376,20 @@
         let cart = {};
         let userLocation = '';
 
-        function selectSize(btn) {
-            const card = btn.closest('.product-card');
-            const productName = card.dataset.product;
-            const size = btn.dataset.size;
-            const price = parseInt(btn.dataset.price);
+        function updateQty(product, size, price, change) {
+            const key = `${product} - ${size}`;
+            
+            if (!cart[key]) {
+                cart[key] = { product, size, price, qty: 0 };
+            }
 
-            const isAlreadyActive = btn.classList.contains('active');
+            cart[key].qty += change;
 
-            card.querySelectorAll('.size-btn').forEach(b => b.classList.remove('active'));
-
-            if (!isAlreadyActive) {
-                btn.classList.add('active');
-                cart[productName] = { size, price };
+            if (cart[key].qty <= 0) {
+                delete cart[key];
+                document.getElementById(`qty-${product}-${size}`).innerText = '0';
             } else {
-                delete cart[productName];
+                document.getElementById(`qty-${product}-${size}`).innerText = cart[key].qty;
             }
 
             calculateTotal();
@@ -319,7 +398,7 @@
         function calculateTotal() {
             let total = 0;
             for (let item in cart) {
-                total += cart[item].price;
+                total += cart[item].price * cart[item].qty;
             }
             document.getElementById('total-val').innerText = total;
         }
@@ -350,7 +429,7 @@
             const address = document.getElementById('cust-address').value.trim();
 
             if (Object.keys(cart).length === 0) {
-                showAlert('الرجاء اختيار منتج واحد على الأقل');
+                showAlert('الرجاء اختيار صنف واحد على الأقل');
                 return;
             }
 
@@ -367,13 +446,14 @@
             orderText += `%0A*الطلبات:*%0A`;
             let total = 0;
             for (let item in cart) {
-                orderText += `- ${item} (${cart[item].size}): ${cart[item].price} ج%0A`;
-                total += cart[item].price;
+                const itemTotal = cart[item].price * cart[item].qty;
+                orderText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} ج%0A`;
+                total += itemTotal;
             }
 
             orderText += `%0A*الإجمالي:* ${total} جنيه`;
 
-            // استبدل الرقم أدناه برقم الواتساب الخاص بك
+            // استبدل هذا الرقم برقم الواتساب الخاص بك
             const phone = "201000000000"; 
             window.open(`https://wa.me/${phone}?text=${orderText}`, '_blank');
         }
