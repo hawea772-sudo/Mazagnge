@@ -1,0 +1,589 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>لُبّ - Labb | أسهل طريقة لطلب التسالي</title>
+  
+  <meta name="theme-color" content="#121212">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="لُبّ">
+  <link rel="apple-touch-icon" href="https://img.icons8.com/emoji/192/sunflower-emoji.png">
+
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+  <style>
+    :root {
+      --bg-color: #121212;
+      --card-bg: #1e1e1e;
+      --card-border: #2c2c2c;
+      --primary: #fbbf24;
+      --primary-hover: #d97706;
+      --text-main: #f3f4f6;
+      --text-muted: #9ca3af;
+      --accent-green: #22c55e;
+      --radius: 16px;
+      --shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: 'Cairo', sans-serif;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-color);
+      color: var(--text-main);
+      padding-bottom: 90px;
+      min-height: 100vh;
+    }
+
+    header {
+      background: var(--card-bg);
+      padding: 20px 16px;
+      text-align: center;
+      border-bottom: 1px solid var(--card-border);
+      position: relative;
+    }
+
+    .logo-container {
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .logo-icon {
+      font-size: 2.2rem;
+      color: var(--primary);
+    }
+
+    header h1 {
+      font-size: 1.8rem;
+      font-weight: 900;
+      color: var(--primary);
+    }
+
+    header p {
+      font-size: 0.85rem;
+      color: var(--text-muted);
+      margin-top: 4px;
+    }
+
+    .admin-btn {
+      position: absolute;
+      left: 16px;
+      top: 20px;
+      background: rgba(255, 255, 255, 0.05);
+      border: 1px solid var(--card-border);
+      color: var(--text-muted);
+      width: 40px;
+      height: 40px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: 0 auto;
+      padding: 16px;
+    }
+
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin: 20px 0 12px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      color: #fff;
+    }
+
+    .section-title i { color: var(--primary); }
+
+    .products-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .product-card {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      border-radius: var(--radius);
+      padding: 16px;
+      box-shadow: var(--shadow);
+    }
+
+    .product-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .product-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      color: #fff;
+    }
+
+    .weight-options {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 8px;
+    }
+
+    .weight-btn {
+      background: #282828;
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 10px 6px;
+      border-radius: 12px;
+      cursor: pointer;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .weight-btn .w-label { font-size: 0.8rem; font-weight: 600; }
+    .weight-btn .w-price { font-size: 0.75rem; color: var(--primary); font-weight: 700; }
+
+    .weight-btn.selected {
+      background: rgba(251, 191, 36, 0.15);
+      border-color: var(--primary);
+      color: var(--primary);
+    }
+
+    .qty-controls {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-top: 12px;
+      background: #181818;
+      padding: 6px 12px;
+      border-radius: 10px;
+    }
+
+    .qty-btn {
+      background: var(--card-border);
+      color: #fff;
+      border: none;
+      width: 28px;
+      height: 28px;
+      border-radius: 6px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    .qty-count { font-size: 0.9rem; font-weight: 700; }
+
+    .form-group { margin-bottom: 14px; }
+    .form-group label {
+      display: block;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 6px;
+      color: var(--text-muted);
+    }
+
+    .form-input {
+      width: 100%;
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: #fff;
+      padding: 12px 14px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      outline: none;
+    }
+
+    .gps-btn {
+      width: 100%;
+      background: #262626;
+      border: 1px dashed var(--primary);
+      color: var(--primary);
+      padding: 12px;
+      border-radius: 12px;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .bottom-bar {
+      position: fixed;
+      bottom: 0; left: 0; right: 0;
+      background: #181818;
+      border-top: 1px solid var(--card-border);
+      padding: 12px 16px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 999;
+      max-width: 500px;
+      margin: 0 auto;
+    }
+
+    .total-info .label { font-size: 0.75rem; color: var(--text-muted); }
+    .total-info .val { font-size: 1.3rem; font-weight: 800; color: var(--primary); }
+
+    .send-btn {
+      background: var(--accent-green);
+      color: #fff;
+      border: none;
+      padding: 12px 24px;
+      border-radius: 30px;
+      font-weight: 800;
+      font-size: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      z-index: 2000;
+      padding: 20px;
+      overflow-y: auto;
+    }
+
+    .modal-content {
+      background: var(--card-bg);
+      border-radius: var(--radius);
+      padding: 20px;
+      max-width: 450px;
+      margin: 40px auto;
+      border: 1px solid var(--card-border);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+    }
+
+    .modal-close {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .admin-item {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+      padding: 10px;
+      background: #141414;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    .admin-inputs {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 6px;
+    }
+
+    .admin-inputs input {
+      background: #222;
+      border: 1px solid #333;
+      color: #fff;
+      padding: 6px;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      text-align: center;
+    }
+
+    .btn-save {
+      width: 100%;
+      background: var(--primary);
+      color: #000;
+      border: none;
+      padding: 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      margin-top: 10px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <button class="admin-btn" onclick="openAdmin()"><i class="fa-solid fa-gear"></i></button>
+    <div class="logo-container">
+      <i class="fa-solid fa-seedling logo-icon"></i>
+      <h1>لُبّ - Labb</h1>
+    </div>
+    <p>أسرع وأسلس طريقة لطلب اللب والمكسرات لحد باب البيت</p>
+  </header>
+
+  <div class="container">
+    <div class="section-title">
+      <i class="fa-solid fa-utensils"></i> اختر أصناف التسالي
+    </div>
+    <div class="products-grid" id="productsList"></div>
+
+    <div class="section-title">
+      <i class="fa-solid fa-user-gear"></i> بيانات التوصيل
+    </div>
+    
+    <div class="form-group">
+      <label>الاسم بالكامل</label>
+      <input type="text" id="custName" class="form-input" placeholder="اكتب اسمك هنا...">
+    </div>
+
+    <div class="form-group">
+      <label>رقم الهاتف</label>
+      <input type="tel" id="custPhone" class="form-input" placeholder="01xxxxxxxxx">
+    </div>
+
+    <div class="form-group">
+      <label>العنوان التفصيلي</label>
+      <input type="text" id="custAddress" class="form-input" placeholder="اسم الشارع - رقم العمارة - الدور">
+    </div>
+
+    <div class="form-group">
+      <button class="gps-btn" onclick="getGPSLocation()">
+        <i class="fa-solid fa-location-dot"></i>
+        <span id="gpsText">مشاركة موقعك المباشر (GPS)</span>
+      </button>
+    </div>
+  </div>
+
+  <div class="bottom-bar">
+    <div class="total-info">
+      <div class="label">إجمالي الحساب:</div>
+      <div class="val"><span id="totalPrice">0</span> جنيه</div>
+    </div>
+    <button class="send-btn" onclick="sendOrder()">
+      <i class="fa-brands fa-whatsapp"></i> إرسال الطلب
+    </button>
+  </div>
+
+  <div class="modal" id="adminModal">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h3 style="color: var(--primary);">لوحة التحكم بالأسعار</h3>
+        <button class="modal-close" onclick="closeAdmin()">&times;</button>
+      </div>
+      <div id="adminItemsList"></div>
+      <button class="btn-save" onclick="saveAdminData()">حفظ التغييرات</button>
+    </div>
+  </div>
+
+  <script>
+    let defaultProducts = [
+      { id: 1, name: "لب سوبر ممتاز", prices: { q: 25, h: 50, k: 100 } },
+      { id: 2, name: "لب عباد (سوري)", prices: { q: 20, h: 40, k: 80 } },
+      { id: 3, name: "لب أبيض فاخر", prices: { q: 40, h: 80, k: 160 } },
+      { id: 4, name: "لب خشب ممتاز", prices: { q: 35, h: 70, k: 140 } },
+      { id: 5, name: "فول سوداني محمص", prices: { q: 15, h: 30, k: 60 } }
+    ];
+
+    let products = JSON.parse(localStorage.getItem('labb_products')) || defaultProducts;
+    let cart = {};
+    let gpsLocation = null;
+
+    function renderProducts() {
+      const container = document.getElementById('productsList');
+      container.innerHTML = '';
+
+      products.forEach(p => {
+        const itemCart = cart[p.id] || { weight: null, qty: 0 };
+        
+        container.innerHTML += `
+          <div class="product-card">
+            <div class="product-header">
+              <span class="product-title">${p.name}</span>
+            </div>
+            <div class="weight-options">
+              <div class="weight-btn ${itemCart.weight === 'q' ? 'selected' : ''}" onclick="selectWeight(${p.id}, 'q')">
+                <span class="w-label">ربع كيلو</span>
+                <span class="w-price">${p.prices.q} ج</span>
+              </div>
+              <div class="weight-btn ${itemCart.weight === 'h' ? 'selected' : ''}" onclick="selectWeight(${p.id}, 'h')">
+                <span class="w-label">نص كيلو</span>
+                <span class="w-price">${p.prices.h} ج</span>
+              </div>
+              <div class="weight-btn ${itemCart.weight === 'k' ? 'selected' : ''}" onclick="selectWeight(${p.id}, 'k')">
+                <span class="w-label">كيلو كامل</span>
+                <span class="w-price">${p.prices.k} ج</span>
+              </div>
+            </div>
+            ${itemCart.weight ? `
+              <div class="qty-controls">
+                <span>الكمية:</span>
+                <div>
+                  <button class="qty-btn" onclick="updateQty(${p.id}, -1)">-</button>
+                  <span class="qty-count">${itemCart.qty}</span>
+                  <button class="qty-btn" onclick="updateQty(${p.id}, 1)">+</button>
+                </div>
+              </div>
+            ` : ''}
+          </div>
+        `;
+      });
+
+      calculateTotal();
+    }
+
+    function selectWeight(prodId, weight) {
+      if (!cart[prodId]) {
+        cart[prodId] = { weight: weight, qty: 1 };
+      } else {
+        cart[prodId].weight = weight;
+        if (cart[prodId].qty === 0) cart[prodId].qty = 1;
+      }
+      renderProducts();
+    }
+
+    function updateQty(prodId, change) {
+      if (!cart[prodId]) return;
+      cart[prodId].qty += change;
+      if (cart[prodId].qty <= 0) {
+        delete cart[prodId];
+      }
+      renderProducts();
+    }
+
+    function calculateTotal() {
+      let total = 0;
+      Object.keys(cart).forEach(id => {
+        const item = cart[id];
+        const prod = products.find(p => p.id == id);
+        if (prod && item.weight) {
+          total += prod.prices[item.weight] * item.qty;
+        }
+      });
+      document.getElementById('totalPrice').innerText = total;
+      return total;
+    }
+
+    function getGPSLocation() {
+      const btnText = document.getElementById('gpsText');
+      if (navigator.geolocation) {
+        btnText.innerText = "جاري تحديد الموقع...";
+        navigator.geolocation.getCurrentPosition(
+          (pos) => {
+            gpsLocation = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+            btnText.innerText = "تم تحديد موقعك بنجاح ✓";
+          },
+          () => {
+            alert("تعذر تحديد الموقع تلقائياً");
+            btnText.innerText = "مشاركة موقعك المباشر (GPS)";
+          }
+        );
+      }
+    }
+
+    function sendOrder() {
+      const name = document.getElementById('custName').value.trim();
+      const phone = document.getElementById('custPhone').value.trim();
+      const address = document.getElementById('custAddress').value.trim();
+      const total = calculateTotal();
+
+      if (Object.keys(cart).length === 0) {
+        alert('برجاء اختيار صنف واحد على الأقل للطلب!');
+        return;
+      }
+
+      if (!name || !phone) {
+        alert('برجاء إدخال الاسم ورقم الهاتف للتوصيل');
+        return;
+      }
+
+      let msg = `🌻 *طلب جديد من تطبيق لُبّ* 🌻\n\n`;
+      msg += `👤 *الاسم:* ${name}\n`;
+      msg += `📞 *الهاتف:* ${phone}\n`;
+      if (address) msg += `🏠 *العنوان:* ${address}\n`;
+      if (gpsLocation) msg += `📍 *موقع GPS:* ${gpsLocation}\n`;
+      
+      msg += `\n🛒 *الطلبات:*\n`;
+      
+      const weightNames = { q: 'ربع كيلو', h: 'نص كيلو', k: 'كيلو كامل' };
+      Object.keys(cart).forEach(id => {
+        const item = cart[id];
+        const prod = products.find(p => p.id == id);
+        if (prod) {
+          msg += `- ${prod.name} (${weightNames[item.weight]}) × ${item.qty}\n`;
+        }
+      });
+
+      msg += `\n💰 *إجمالي الحساب:* ${total} جنيه`;
+
+      const whatsappURL = `https://wa.me/201029567996?text=${encodeURIComponent(msg)}`;
+      window.open(whatsappURL, '_blank');
+    }
+
+    function openAdmin() {
+      const pwd = prompt("أدخل كلمة المرور لدخول لوحة التحكم:");
+      if (pwd === "1234") {
+        renderAdminItems();
+        document.getElementById('adminModal').style.display = 'block';
+      } else if (pwd !== null) {
+        alert("كلمة المرور غير صحيحة!");
+      }
+    }
+
+    function closeAdmin() {
+      document.getElementById('adminModal').style.display = 'none';
+    }
+
+    function renderAdminItems() {
+      const container = document.getElementById('adminItemsList');
+      container.innerHTML = '';
+
+      products.forEach((p, idx) => {
+        container.innerHTML += `
+          <div class="admin-item">
+            <input type="text" value="${p.name}" id="p_name_${idx}" class="form-input" style="font-weight:bold;">
+            <div class="admin-inputs">
+              <div><label>ربع (ج):</label><input type="number" value="${p.prices.q}" id="p_q_${idx}"></div>
+              <div><label>نص (ج):</label><input type="number" value="${p.prices.h}" id="p_h_${idx}"></div>
+              <div><label>كيلو (ج):</label><input type="number" value="${p.prices.k}" id="p_k_${idx}"></div>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function saveAdminData() {
+      products.forEach((p, idx) => {
+        p.name = document.getElementById(`p_name_${idx}`).value;
+        p.prices.q = parseFloat(document.getElementById(`p_q_${idx}`).value) || 0;
+        p.prices.h = parseFloat(document.getElementById(`p_h_${idx}`).value) || 0;
+        p.prices.k = parseFloat(document.getElementById(`p_k_${idx}`).value) || 0;
+      });
+
+      localStorage.setItem('labb_products', JSON.stringify(products));
+      alert("تم حفظ الأسعار الجديدة بنجاح!");
+      closeAdmin();
+      renderProducts();
+    }
+
+    renderProducts();
+  </script>
+</body>
+</html>
