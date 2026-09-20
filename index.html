@@ -3,591 +3,123 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>لُبّ - Labb | أسهل طريقة لطلب التسالي</title>
-    <meta name="theme-color" content="#121212">
-    <link rel="manifest" href="/manifest.json">
+    <title>لُبّ - Labb</title>
     <style>
         :root {
-            --bg-color: #121212;
-            --card-bg: #1e1e1e;
-            --accent-color: #f39c12;
+            --bg-gradient: linear-gradient(135deg, #0f2027, #203a43, #2c5364);
+            --card-glass: rgba(255, 255, 255, 0.07);
+            --card-border: rgba(255, 255, 255, 0.12);
+            --accent: #ffb703;
             --text-color: #ffffff;
-            --text-secondary: #a0a0a0;
-            --border-color: #333333;
-        }
-
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
         }
 
         body {
-            background-color: var(--bg-color);
+            background: var(--bg-gradient);
+            background-attachment: fixed;
             color: var(--text-color);
+            font-family: system-ui, -apple-system, sans-serif;
             padding: 15px;
-            max-width: 500px;
+            max-width: 480px;
             margin: 0 auto;
             direction: rtl;
         }
 
-        /* --- شاشة المقدمة --- */
-        #intro-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: #0d0d0d;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease, visibility 0.8s;
-        }
-
-        .intro-title-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
-        }
-
-        .intro-main-text {
-            font-size: 2.2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f1c40f, #f39c12, #e67e22);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulseGlow 2s infinite ease-in-out;
-        }
-
-        .intro-brand-text {
-            font-size: 1.6rem;
-            font-weight: bold;
-            color: #ffffff;
-            border-right: 2px solid var(--accent-color);
-            padding-right: 10px;
-        }
-
-        .intro-subtext {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            opacity: 0;
-            animation: fadeIn 1s forwards 0.5s;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.85; transform: scale(0.98); }
-            50% { opacity: 1; transform: scale(1.03); }
-        }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* --- الهيدر والأزرار --- */
         header {
             text-align: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
+            padding: 20px;
+            background: var(--card-glass);
+            backdrop-filter: blur(10px);
+            border-radius: 20px;
+            border: 1px solid var(--card-border);
             margin-bottom: 20px;
-            position: relative;
         }
 
-        header h1 {
-            color: var(--accent-color);
-            font-size: 1.8rem;
-        }
+        header h1 { color: var(--accent); font-size: 2rem; margin-bottom: 5px; }
 
-        header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        .admin-trigger {
-            position: absolute;
-            left: 0; top: 10px;
-            background: transparent;
-            border: none;
-            color: var(--border-color);
-            font-size: 1.2rem;
-            cursor: pointer;
-        }
-
-        /* --- المنتجات --- */
         .product-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
+            background: var(--card-glass);
+            backdrop-filter: blur(12px);
+            border: 1px solid var(--card-border);
+            border-radius: 18px;
+            padding: 18px;
             margin-bottom: 15px;
-            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
         }
 
         .product-title {
-            font-size: 1.2rem;
+            font-size: 1.25rem;
             font-weight: bold;
-            margin-bottom: 12px;
-            color: #fff;
+            color: var(--accent);
+            margin-bottom: 15px;
         }
 
         .size-row {
             display: flex;
-            align-items: center;
             justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .size-row:last-child { border-bottom: none; }
-
-        .size-price {
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 0.9rem;
+            align-items: center;
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
         }
 
         .qty-controls {
             display: flex;
             align-items: center;
-            gap: 10px;
-            background: #2a2a2a;
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
+            gap: 12px;
+            background: rgba(0,0,0,0.3);
+            padding: 6px 12px;
+            border-radius: 30px;
         }
 
         .qty-btn {
-            background: var(--accent-color);
+            background: var(--accent);
             color: #000;
             border: none;
-            width: 26px; height: 26px;
-            border-radius: 6px;
+            width: 28px; height: 28px;
+            border-radius: 50%;
             font-weight: bold;
-            font-size: 1.1rem;
             cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .qty-btn.minus { background: #444; color: #fff; }
-
-        .qty-count {
-            font-size: 1rem;
-            font-weight: bold;
-            min-width: 18px;
-            text-align: center;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            margin: 20px 0 10px 0;
-            display: flex; align-items: center; gap: 8px;
-            color: var(--accent-color);
-        }
-
-        .input-group { margin-bottom: 12px; }
-
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
         }
 
         .input-group input {
             width: 100%;
-            padding: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: #fff;
-            font-size: 0.95rem;
-        }
-
-        .location-btn {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1px dashed var(--accent-color);
-            color: var(--accent-color);
-            border-radius: 8px;
-            font-size: 0.95rem;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .footer-cart {
-            position: sticky;
-            bottom: 10px;
-            background: var(--card-bg);
-            padding: 15px;
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.2);
+            border: 1px solid var(--card-border);
             border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            margin-top: 20px;
-        }
-
-        .total-price span {
-            color: var(--accent-color);
-            font-size: 1.3rem;
+            color: #fff;
+            margin-top: 5px;
+            margin-bottom: 10px;
         }
 
         .send-btn {
-            background: #25d366;
-            color: #fff;
+            background: linear-gradient(45deg, #25d366, #128c7e);
+            color: white;
             border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
+            padding: 14px 25px;
+            border-radius: 30px;
             font-weight: bold;
             font-size: 1rem;
             cursor: pointer;
-        }
-
-        /* --- لوحة التحكم وتغيير الرقم --- */
-        #admin-panel {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #121212;
-            z-index: 10000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .save-admin-btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .close-admin-btn {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            justify-content: center; align-items: center;
-            z-index: 10001;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 300px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .modal-btn {
-            margin-top: 15px;
-            padding: 8px 20px;
-            background: var(--accent-color);
-            border: none;
-            border-radius: 6px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(37, 211, 102, 0.4);
         }
     </style>
 </head>
 <body>
-
-    <!-- الشاشة الافتتاحية -->
-    <div id="intro-screen">
-        <div class="intro-title-container">
-            <span class="intro-main-text">على كيفك</span>
-            <span class="intro-brand-text">Alhawe</span>
-        </div>
-        <p class="intro-subtext">أفضل تجربة لطلب التسالي ☕</p>
-    </div>
-
     <header>
-        <button class="admin-trigger" onclick="openAdminLogin()">⚙️</button>
-        <h1>لُبّ - Labb</h1>
-        <p>أسهل طريقة لطلب التسالي</p>
+        <h1>🌻 لُـبّ - Labb</h1>
+        <p>التسالي الذهبية بين يديك</p>
     </header>
 
-    <!-- عرض الاصناف -->
-    <div id="products-container"></div>
-
-    <!-- بيانات التوصيل -->
-    <div class="section-title">👤 بيانات التوصيل</div>
-    
-    <div class="input-group">
-        <label>الاسم بالكامل</label>
-        <input type="text" id="cust-name" placeholder="اكتب اسمك هنا...">
-    </div>
-
-    <div class="input-group">
-        <label>رقم الهاتف</label>
-        <input type="tel" id="cust-phone" placeholder="اكتب رقم الهاتف...">
-    </div>
-
-    <div class="input-group">
-        <label>العنوان التفصيلي</label>
-        <input type="text" id="cust-address" placeholder="اسم الشارع - رقم العمارة - الدور">
-    </div>
-
-    <button class="location-btn" id="location-btn" onclick="getLocation()">📍 تحديد الموقع تلقائياً...</button>
-
-    <!-- الفوتر مع الإجمالي والواتساب -->
-    <div class="footer-cart">
-        <div class="total-price">إجمالي الحساب: <br><span id="total-val">0</span> جنيه</div>
-        <button class="send-btn" onclick="sendOrder()">إرسال الطلب 💬</button>
-    </div>
-
-    <!-- لوحة التحكم -->
-    <div id="admin-panel">
-        <div class="admin-header">
-            <h2>⚙️ إعدادات الواتساب</h2>
-            <button class="close-admin-btn" onclick="closeAdmin()">إغلاق ✖</button>
-        </div>
-
-        <div class="input-group">
-            <label style="color: var(--accent-color); font-size: 1rem; font-weight: bold;">📱 رقم الواتساب لاستلام الطلبات:</label>
-            <input type="text" id="admin-phone" placeholder="مثال: 201012345678 (بدون +)">
-            <small style="color:#888; display:block; margin-top:4px;">اكتب الرقم برمز الدولة (مثال لمصر: 2010...)</small>
-        </div>
-
-        <button class="save-admin-btn" onclick="saveAdminChanges()">💾 حفظ رقم الواتساب</button>
-    </div>
-
-    <!-- التنبيهات -->
-    <div class="modal" id="alert-modal">
-        <div class="modal-content">
-            <p id="modal-text">تنبيه</p>
-            <button class="modal-btn" onclick="closeModal()">إغلاق</button>
+    <div class="product-card">
+        <div class="product-title">لب أسود فاخر</div>
+        <div class="size-row">
+            <span>ربع كيلو (30 ج)</span>
+            <div class="qty-controls">
+                <button class="qty-btn">-</button>
+                <span>0</span>
+                <button class="qty-btn">+</button>
+            </div>
         </div>
     </div>
-
-    <script>
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const intro = document.getElementById('intro-screen');
-                if (intro) {
-                    intro.style.opacity = '0';
-                    intro.style.visibility = 'hidden';
-                }
-            }, 2200);
-            renderProducts();
-        });
-
-        const productsData = [
-            {
-                name: "لب أسود",
-                sizes: [
-                    { name: "ربع كيلو", price: 30 },
-                    { name: "نص كيلو", price: 60 },
-                    { name: "كيلو كامل", price: 120 }
-                ]
-            },
-            {
-                name: "لب أصفر",
-                sizes: [
-                    { name: "ربع كيلو", price: 30 },
-                    { name: "نص كيلو", price: 60 },
-                    { name: "كيلو كامل", price: 120 }
-                ]
-            },
-            {
-                name: "لب أبيض فاخر",
-                sizes: [
-                    { name: "ربع كيلو", price: 40 },
-                    { name: "نص كيلو", price: 80 },
-                    { name: "كيلو كامل", price: 160 }
-                ]
-            }
-        ];
-
-        let whatsappPhone = localStorage.getItem('labb_phone') || '201000000000';
-        let cart = {};
-        let userLocation = '';
-
-        function renderProducts() {
-            const container = document.getElementById('products-container');
-            container.innerHTML = '';
-
-            productsData.forEach((prod, prodIdx) => {
-                let cardHtml = `
-                    <div class="product-card">
-                        <div class="product-title">${prod.name}</div>
-                `;
-
-                prod.sizes.forEach((sz, szIdx) => {
-                    const key = `${prod.name} - ${sz.name}`;
-                    const currentQty = cart[key] ? cart[key].qty : 0;
-
-                    cardHtml += `
-                        <div class="size-row">
-                            <div class="size-info">${sz.name} <span class="size-price">(${sz.price} ج)</span></div>
-                            <div class="qty-controls">
-                                <button class="qty-btn minus" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, -1)">-</button>
-                                <span class="qty-count" id="qty-${prodIdx}-${szIdx}">${currentQty}</span>
-                                <button class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, 1)">+</button>
-                            </div>
-                        </div>
-                    `;
-                });
-
-                cardHtml += `</div>`;
-                container.innerHTML += cardHtml;
-            });
-        }
-
-        function updateQty(product, size, price, change) {
-            const key = `${product} - ${size}`;
-            
-            if (!cart[key]) {
-                cart[key] = { product, size, price, qty: 0 };
-            }
-
-            cart[key].qty += change;
-
-            if (cart[key].qty <= 0) {
-                delete cart[key];
-            }
-
-            calculateTotal();
-            renderProducts();
-        }
-
-        function calculateTotal() {
-            let total = 0;
-            for (let item in cart) {
-                total += cart[item].price * cart[item].qty;
-            }
-            document.getElementById('total-val').innerText = total;
-        }
-
-        function getLocation() {
-            const btn = document.getElementById('location-btn');
-            btn.innerText = 'جاري تحديد الموقع...';
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        userLocation = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
-                        btn.innerText = '✅ تم تحديد الموقع بنجاح!';
-                    },
-                    (err) => {
-                        showAlert('تعذر تحديد الموقع تلقائياً');
-                        btn.innerText = '📍 تحديد الموقع تلقائياً...';
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 }
-                );
-            } else {
-                showAlert('متصفحك لا يدعم تحديد الموقع');
-            }
-        }
-
-        function sendOrder() {
-            const name = document.getElementById('cust-name').value.trim();
-            const phone = document.getElementById('cust-phone').value.trim();
-            const address = document.getElementById('cust-address').value.trim();
-
-            if (Object.keys(cart).length === 0) {
-                showAlert('الرجاء اختيار صنف واحد على الأقل');
-                return;
-            }
-
-            if (!name) {
-                showAlert('الرجاء كتابة الاسم بالكامل');
-                return;
-            }
-
-            let fullAddress = address;
-            if (userLocation) {
-                fullAddress += fullAddress ? ` (${userLocation})` : userLocation;
-            }
-
-            let itemsText = "";
-            let subtotal = 0;
-            for (let item in cart) {
-                const itemTotal = cart[item].price * cart[item].qty;
-                itemsText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه%0A`;
-                subtotal += itemTotal;
-            }
-
-            const deliveryFee = "حسب المنطقة"; // يمكنك تعديلها أو جعلها خياراً
-
-            let orderText = `🌻 *طلب جديد من تطبيق "لُـبّ"* 🌻%0A%0A`;
-            orderText += `👤 *العميل:* ${name}%0A`;
-            orderText += `📞 *الهاتف:* ${phone || 'غير مدخل'}%0A`;
-            orderText += `📍 *العنوان:* ${fullAddress || 'غير مدخل'}%0A%0A`;
-            orderText += `📦 *تفاصيل المشتريات:*%0A${itemsText}%0A`;
-            orderText += `💵 *سعر المشتريات:* ${subtotal} جنيه%0A`;
-            orderText += `🛵 *خدمة التوصيل:* ${deliveryFee}%0A`;
-            orderText += `💰 *الإجمالي الكلي:* ${subtotal} جنيه%0A%0A`;
-            orderText += `برجاء التأكيد وتحديد موعد التسليم.`;
-
-            window.open(`https://wa.me/${whatsappPhone}?text=${orderText}`, '_blank');
-        }
-
-        function openAdminLogin() {
-            const pass = prompt("أدخل كلمة سر لوحة التحكم:");
-            if (pass === "1234") {
-                document.getElementById('admin-phone').value = whatsappPhone;
-                document.getElementById('admin-panel').style.display = 'block';
-            } else if (pass !== null) {
-                showAlert("كلمة السر غير صحيحة!");
-            }
-        }
-
-        function closeAdmin() {
-            document.getElementById('admin-panel').style.display = 'none';
-        }
-
-        function saveAdminChanges() {
-            const newPhone = document.getElementById('admin-phone').value.trim();
-            if (newPhone) {
-                whatsappPhone = newPhone;
-                localStorage.setItem('labb_phone', whatsappPhone);
-                showAlert("✅ تم حفظ رقم الواتساب بنجاح!");
-                closeAdmin();
-            } else {
-                showAlert("برجاء إدخال الرقم بطريقة صحيحة");
-            }
-        }
-
-        function showAlert(msg) {
-            document.getElementById('modal-text').innerText = msg;
-            document.getElementById('alert-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('alert-modal').style.display = 'none';
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
-        }
-    </script>
 </body>
 </html>
