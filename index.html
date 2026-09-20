@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
- <link rel="manifest" href="/manifest.json">  
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>لُبّ - Labb | أسهل طريقة لطلب التسالي</title>
@@ -33,6 +32,65 @@
             direction: rtl;
         }
 
+        /* --- شاشة المقدمة الاحترافية --- */
+        #intro-screen {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #0d0d0d;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 9999;
+            transition: opacity 0.8s ease, visibility 0.8s;
+        }
+
+        .intro-title-container {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 8px;
+        }
+
+        .intro-main-text {
+            font-size: 2.2rem;
+            font-weight: 800;
+            color: #f39c12;
+            background: linear-gradient(135deg, #f1c40f, #f39c12, #e67e22);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            animation: pulseGlow 2s infinite ease-in-out;
+        }
+
+        .intro-brand-text {
+            font-size: 1.6rem;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 1px;
+            border-right: 2px solid var(--accent-color);
+            padding-right: 10px;
+        }
+
+        .intro-subtext {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+            opacity: 0;
+            animation: fadeIn 1s forwards 0.5s;
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { opacity: 0.85; transform: scale(0.98); }
+            50% { opacity: 1; transform: scale(1.03); }
+        }
+
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+
+        /* --- بقية تنسيقات التطبيق --- */
         header {
             text-align: center;
             padding: 15px 0;
@@ -242,6 +300,15 @@
 </head>
 <body>
 
+    <!-- الشاشة الافتتاحية عند فتح التطبيق -->
+    <div id="intro-screen">
+        <div class="intro-title-container">
+            <span class="intro-main-text">على كيفك</span>
+            <span class="intro-brand-text">Alhawe</span>
+        </div>
+        <p class="intro-subtext">أفضل تجربة لطلب التسالي ☕</p>
+    </div>
+
     <header>
         <h1>لُبّ - Labb</h1>
         <p>أسهل طريقة لطلب التسالي</p>
@@ -373,6 +440,17 @@
     </div>
 
     <script>
+        // إخفاء المقدمة تلقائياً بعد ثانيتين ونصف
+        window.addEventListener('DOMContentLoaded', () => {
+            setTimeout(() => {
+                const intro = document.getElementById('intro-screen');
+                if (intro) {
+                    intro.style.opacity = '0';
+                    intro.style.visibility = 'hidden';
+                }
+            }, 2200);
+        });
+
         let cart = {};
         let userLocation = '';
 
@@ -466,9 +544,10 @@
         function closeModal() {
             document.getElementById('alert-modal').style.display = 'none';
         }
-  if ('serviceWorker' in navigator) {
-    navigator.serviceWorker.register('/sw.js');
-}
+
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('/sw.js');
+        }
     </script>
 </body>
 </html>
