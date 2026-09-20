@@ -334,7 +334,7 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- عرض الاصناف بأسعارها وإمكانية زيادة الكمية -->
+    <!-- عرض الاصناف -->
     <div id="products-container"></div>
 
     <!-- بيانات التوصيل -->
@@ -343,6 +343,11 @@
     <div class="input-group">
         <label>الاسم بالكامل</label>
         <input type="text" id="cust-name" placeholder="اكتب اسمك هنا...">
+    </div>
+
+    <div class="input-group">
+        <label>رقم الهاتف</label>
+        <input type="tel" id="cust-phone" placeholder="اكتب رقم الهاتف...">
     </div>
 
     <div class="input-group">
@@ -358,7 +363,7 @@
         <button class="send-btn" onclick="sendOrder()">إرسال الطلب 💬</button>
     </div>
 
-    <!-- --- لوحة التحكم وتغيير الرقم --- -->
+    <!-- لوحة التحكم -->
     <div id="admin-panel">
         <div class="admin-header">
             <h2>⚙️ إعدادات الواتساب</h2>
@@ -394,7 +399,6 @@
             renderProducts();
         });
 
-        // الاصناف الثابتة الأصيلة
         const productsData = [
             {
                 name: "لب أسود",
@@ -505,6 +509,7 @@
 
         function sendOrder() {
             const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
             const address = document.getElementById('cust-address').value.trim();
 
             if (Object.keys(cart).length === 0) {
@@ -517,20 +522,30 @@
                 return;
             }
 
-            let orderText = `*طلب جديد من تطبيق لُبّ*%0A%0A`;
-            orderText += `*العميل:* ${name}%0A`;
-            if (address) orderText += `*العنوان:* ${address}%0A`;
-            if (userLocation) orderText += `*الموقع على الخريطة:* ${userLocation}%0A`;
-            
-            orderText += `%0A*الطلبات:*%0A`;
-            let total = 0;
-            for (let item in cart) {
-                const itemTotal = cart[item].price * cart[item].qty;
-                orderText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} ج%0A`;
-                total += itemTotal;
+            let fullAddress = address;
+            if (userLocation) {
+                fullAddress += fullAddress ? ` (${userLocation})` : userLocation;
             }
 
-            orderText += `%0A*الإجمالي:* ${total} جنيه`;
+            let itemsText = "";
+            let subtotal = 0;
+            for (let item in cart) {
+                const itemTotal = cart[item].price * cart[item].qty;
+                itemsText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه%0A`;
+                subtotal += itemTotal;
+            }
+
+            const deliveryFee = "حسب المنطقة"; // يمكنك تعديلها أو جعلها خياراً
+
+            let orderText = `🌻 *طلب جديد من تطبيق "لُـبّ"* 🌻%0A%0A`;
+            orderText += `👤 *العميل:* ${name}%0A`;
+            orderText += `📞 *الهاتف:* ${phone || 'غير مدخل'}%0A`;
+            orderText += `📍 *العنوان:* ${fullAddress || 'غير مدخل'}%0A%0A`;
+            orderText += `📦 *تفاصيل المشتريات:*%0A${itemsText}%0A`;
+            orderText += `💵 *سعر المشتريات:* ${subtotal} جنيه%0A`;
+            orderText += `🛵 *خدمة التوصيل:* ${deliveryFee}%0A`;
+            orderText += `💰 *الإجمالي الكلي:* ${subtotal} جنيه%0A%0A`;
+            orderText += `برجاء التأكيد وتحديد موعد التسليم.`;
 
             window.open(`https://wa.me/${whatsappPhone}?text=${orderText}`, '_blank');
         }
