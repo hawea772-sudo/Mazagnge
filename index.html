@@ -84,7 +84,7 @@
 
         @keyframes fadeIn { to { opacity: 1; } }
 
-        /* --- الهيدر والأزرار --- */
+        /* --- الهيدر --- */
         header {
             text-align: center;
             padding: 15px 0;
@@ -102,16 +102,6 @@
             color: var(--text-secondary);
             font-size: 0.9rem;
             margin-top: 5px;
-        }
-
-        .admin-trigger {
-            position: absolute;
-            left: 0; top: 10px;
-            background: transparent;
-            border: none;
-            color: var(--border-color);
-            font-size: 1.2rem;
-            cursor: pointer;
         }
 
         /* --- المنتجات --- */
@@ -246,47 +236,6 @@
             cursor: pointer;
         }
 
-        /* --- لوحة التحكم وتغيير الرقم --- */
-        #admin-panel {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; width: 100vw; height: 100vh;
-            background: #121212;
-            z-index: 10000;
-            padding: 20px;
-            overflow-y: auto;
-        }
-
-        .admin-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            border-bottom: 1px solid var(--border-color);
-            padding-bottom: 10px;
-            margin-bottom: 20px;
-        }
-
-        .save-admin-btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 10px 18px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            width: 100%;
-            margin-top: 15px;
-        }
-
-        .close-admin-btn {
-            background: #e74c3c;
-            color: #fff;
-            border: none;
-            padding: 8px 15px;
-            border-radius: 6px;
-            cursor: pointer;
-        }
-
         .modal {
             display: none;
             position: fixed;
@@ -329,7 +278,6 @@
     </div>
 
     <header>
-        <button class="admin-trigger" onclick="openAdminLogin()">⚙️</button>
         <h1>لُبّ - Labb</h1>
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
@@ -341,18 +289,18 @@
     <div class="section-title">👤 بيانات التوصيل</div>
     
     <div class="input-group">
-        <label>الاسم بالكامل</label>
-        <input type="text" id="cust-name" placeholder="اكتب اسمك هنا...">
+        <label for="cust-name">الاسم بالكامل</label>
+        <input type="text" id="cust-name" maxlength="50" placeholder="اكتب اسمك هنا..." autocomplete="name">
     </div>
 
     <div class="input-group">
-        <label>رقم الهاتف</label>
-        <input type="tel" id="cust-phone" placeholder="اكتب رقم الهاتف...">
+        <label for="cust-phone">رقم الهاتف</label>
+        <input type="tel" id="cust-phone" maxlength="15" placeholder="اكتب رقم الهاتف..." autocomplete="tel">
     </div>
 
     <div class="input-group">
-        <label>العنوان التفصيلي</label>
-        <input type="text" id="cust-address" placeholder="اسم الشارع - رقم العمارة - الدور">
+        <label for="cust-address">العنوان التفصيلي</label>
+        <input type="text" id="cust-address" maxlength="150" placeholder="اسم الشارع - رقم العمارة - الدور" autocomplete="street-address">
     </div>
 
     <button class="location-btn" id="location-btn" onclick="getLocation()">📍 تحديد الموقع تلقائياً...</button>
@@ -361,22 +309,6 @@
     <div class="footer-cart">
         <div class="total-price">إجمالي الحساب: <br><span id="total-val">0</span> جنيه</div>
         <button class="send-btn" onclick="sendOrder()">إرسال الطلب 💬</button>
-    </div>
-
-    <!-- لوحة التحكم -->
-    <div id="admin-panel">
-        <div class="admin-header">
-            <h2>⚙️ إعدادات الواتساب</h2>
-            <button class="close-admin-btn" onclick="closeAdmin()">إغلاق ✖</button>
-        </div>
-
-        <div class="input-group">
-            <label style="color: var(--accent-color); font-size: 1rem; font-weight: bold;">📱 رقم الواتساب لاستلام الطلبات:</label>
-            <input type="text" id="admin-phone" placeholder="مثال: 201012345678 (بدون +)">
-            <small style="color:#888; display:block; margin-top:4px;">اكتب الرقم برمز الدولة (مثال لمصر: 2010...)</small>
-        </div>
-
-        <button class="save-admin-btn" onclick="saveAdminChanges()">💾 حفظ رقم الواتساب</button>
     </div>
 
     <!-- التنبيهات -->
@@ -388,6 +320,9 @@
     </div>
 
     <script>
+        // إدخال رقم الواتساب الثابت الخاص بك هنا بشكل آمن دون إتاحة تعديله محلّياً
+        const SYSTEM_WHATSAPP_NUMBER = "201000000000"; // استبدل هذا برقمك الحقيقي برمز الدولة بدون +
+
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
                 const intro = document.getElementById('intro-screen');
@@ -426,9 +361,15 @@
             }
         ];
 
-        let whatsappPhone = localStorage.getItem('labb_phone') || '201000000000';
         let cart = {};
         let userLocation = '';
+
+        // دالة لتنظيف مدخلات النص وتجنب ثغرات XSS
+        function sanitizeInput(str) {
+            const temp = document.createElement('div');
+            temp.textContent = str;
+            return temp.innerHTML.trim();
+        }
 
         function renderProducts() {
             const container = document.getElementById('products-container');
@@ -437,7 +378,7 @@
             productsData.forEach((prod, prodIdx) => {
                 let cardHtml = `
                     <div class="product-card">
-                        <div class="product-title">${prod.name}</div>
+                        <div class="product-title">${sanitizeInput(prod.name)}</div>
                 `;
 
                 prod.sizes.forEach((sz, szIdx) => {
@@ -446,7 +387,7 @@
 
                     cardHtml += `
                         <div class="size-row">
-                            <div class="size-info">${sz.name} <span class="size-price">(${sz.price} ج)</span></div>
+                            <div class="size-info">${sanitizeInput(sz.name)} <span class="size-price">(${sz.price} ج)</span></div>
                             <div class="qty-controls">
                                 <button class="qty-btn minus" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, -1)">-</button>
                                 <span class="qty-count" id="qty-${prodIdx}-${szIdx}">${currentQty}</span>
@@ -493,7 +434,9 @@
             if (navigator.geolocation) {
                 navigator.geolocation.getCurrentPosition(
                     (pos) => {
-                        userLocation = `https://maps.google.com/?q=${pos.coords.latitude},${pos.coords.longitude}`;
+                        const lat = pos.coords.latitude;
+                        const lng = pos.coords.longitude;
+                        userLocation = `https://maps.google.com/?q=${lat},${lng}`;
                         btn.innerText = '✅ تم تحديد الموقع بنجاح!';
                     },
                     (err) => {
@@ -508,9 +451,13 @@
         }
 
         function sendOrder() {
-            const name = document.getElementById('cust-name').value.trim();
-            const phone = document.getElementById('cust-phone').value.trim();
-            const address = document.getElementById('cust-address').value.trim();
+            const rawName = document.getElementById('cust-name').value;
+            const rawPhone = document.getElementById('cust-phone').value;
+            const rawAddress = document.getElementById('cust-address').value;
+
+            const name = sanitizeInput(rawName);
+            const phone = sanitizeInput(rawPhone);
+            const address = sanitizeInput(rawAddress);
 
             if (Object.keys(cart).length === 0) {
                 showAlert('الرجاء اختيار صنف واحد على الأقل');
@@ -535,45 +482,19 @@
                 subtotal += itemTotal;
             }
 
-            const deliveryFee = "حسب المنطقة"; // يمكنك تعديلها أو جعلها خياراً
+            const deliveryFee = "حسب المنطقة";
 
             let orderText = `🌻 *طلب جديد من تطبيق "لُـبّ"* 🌻%0A%0A`;
-            orderText += `👤 *العميل:* ${name}%0A`;
-            orderText += `📞 *الهاتف:* ${phone || 'غير مدخل'}%0A`;
-            orderText += `📍 *العنوان:* ${fullAddress || 'غير مدخل'}%0A%0A`;
+            orderText += `👤 *العميل:* ${encodeURIComponent(name)}%0A`;
+            orderText += `📞 *الهاتف:* ${encodeURIComponent(phone || 'غير مدخل')}%0A`;
+            orderText += `📍 *العنوان:* ${encodeURIComponent(fullAddress || 'غير مدخل')}%0A%0A`;
             orderText += `📦 *تفاصيل المشتريات:*%0A${itemsText}%0A`;
             orderText += `💵 *سعر المشتريات:* ${subtotal} جنيه%0A`;
             orderText += `🛵 *خدمة التوصيل:* ${deliveryFee}%0A`;
             orderText += `💰 *الإجمالي الكلي:* ${subtotal} جنيه%0A%0A`;
             orderText += `برجاء التأكيد وتحديد موعد التسليم.`;
 
-            window.open(`https://wa.me/${whatsappPhone}?text=${orderText}`, '_blank');
-        }
-
-        function openAdminLogin() {
-            const pass = prompt("أدخل كلمة سر لوحة التحكم:");
-            if (pass === "1234") {
-                document.getElementById('admin-phone').value = whatsappPhone;
-                document.getElementById('admin-panel').style.display = 'block';
-            } else if (pass !== null) {
-                showAlert("كلمة السر غير صحيحة!");
-            }
-        }
-
-        function closeAdmin() {
-            document.getElementById('admin-panel').style.display = 'none';
-        }
-
-        function saveAdminChanges() {
-            const newPhone = document.getElementById('admin-phone').value.trim();
-            if (newPhone) {
-                whatsappPhone = newPhone;
-                localStorage.setItem('labb_phone', whatsappPhone);
-                showAlert("✅ تم حفظ رقم الواتساب بنجاح!");
-                closeAdmin();
-            } else {
-                showAlert("برجاء إدخال الرقم بطريقة صحيحة");
-            }
+            window.open(`https://wa.me/${SYSTEM_WHATSAPP_NUMBER}?text=${orderText}`, '_blank');
         }
 
         function showAlert(msg) {
@@ -586,7 +507,7 @@
         }
 
         if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js');
+            navigator.serviceWorker.register('/sw.js').catch(() => {});
         }
     </script>
 </body>
