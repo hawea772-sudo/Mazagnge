@@ -322,12 +322,10 @@
     </div>
 
     <script>
-        // مفاتيح EmailJS الخاصة بك
         const EMAILJS_PUBLIC_KEY = "GmJXhbuFZa7wFxvn_";
         const EMAILJS_SERVICE_ID = "service_ofjx955";
-        const EMAILJS_TEMPLATE_ID = "template_xat6xes";
+        const EMAILJS_TEMPLATE_ID = "template_saoi1m1";
 
-        // تهيئة الخدمة
         (function() {
             emailjs.init(EMAILJS_PUBLIC_KEY);
         })();
@@ -458,7 +456,6 @@
             }
         }
 
-        // دالة إرسال الطلب عبر البريد الإلكتروني
         function sendOrder() {
             const rawName = document.getElementById('cust-name').value;
             const rawPhone = document.getElementById('cust-phone').value;
@@ -487,11 +484,10 @@
             let subtotal = 0;
             for (let item in cart) {
                 const itemTotal = cart[item].price * cart[item].qty;
-                itemsText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه\n`;
+                itemsText += `• ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه\n`;
                 subtotal += itemTotal;
             }
 
-            // إرسال البيانات إلى EmailJS
             const sendBtn = document.getElementById('send-btn');
             sendBtn.innerText = "جاري الإرسال...";
             sendBtn.disabled = true;
