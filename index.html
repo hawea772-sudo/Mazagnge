@@ -226,8 +226,8 @@
         }
 
         .send-btn {
-            background: #25d366;
-            color: #fff;
+            background: var(--accent-color);
+            color: #000;
             border: none;
             padding: 12px 20px;
             border-radius: 8px;
@@ -265,6 +265,8 @@
             cursor: pointer;
         }
     </style>
+    <!-- مكتبة EmailJS SDK -->
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
 </head>
 <body>
 
@@ -305,10 +307,10 @@
 
     <button class="location-btn" id="location-btn" onclick="getLocation()">📍 تحديد الموقع تلقائياً...</button>
 
-    <!-- الفوتر مع الإجمالي والواتساب -->
+    <!-- الفوتر مع الإجمالي وزر الإرسال -->
     <div class="footer-cart">
         <div class="total-price">إجمالي الحساب: <br><span id="total-val">0</span> جنيه</div>
-        <button class="send-btn" onclick="sendOrder()">إرسال الطلب 💬</button>
+        <button class="send-btn" id="send-btn" onclick="sendOrder()">إرسال الطلب 📧</button>
     </div>
 
     <!-- التنبيهات -->
@@ -320,13 +322,15 @@
     </div>
 
     <script>
-        // إدخال رقم الواتساب الثابت الخاص بك هنا بشكل آمن دون إتاحة تعديله محلّياً
+        // مفاتيح EmailJS الخاصة بك
         const EMAILJS_PUBLIC_KEY = "GmJXhbuFZa7wFxvn_";
-const EMAILJS_SERVICE_ID = "service_ofjx955";
-const EMAILJS_TEMPLATE_ID = "template_xat6xes";
+        const EMAILJS_SERVICE_ID = "service_ofjx955";
+        const EMAILJS_TEMPLATE_ID = "template_xat6xes";
 
-// تهيئة الخدمة
-emailjs.init(EMAILJS_PUBLIC_KEY); // استبدل هذا برقمك الحقيقي برمز الدولة بدون +
+        // تهيئة الخدمة
+        (function() {
+            emailjs.init(EMAILJS_PUBLIC_KEY);
+        })();
 
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
@@ -369,7 +373,6 @@ emailjs.init(EMAILJS_PUBLIC_KEY); // استبدل هذا برقمك الحقيق
         let cart = {};
         let userLocation = '';
 
-        // دالة لتنظيف مدخلات النص وتجنب ثغرات XSS
         function sanitizeInput(str) {
             const temp = document.createElement('div');
             temp.textContent = str;
@@ -455,6 +458,7 @@ emailjs.init(EMAILJS_PUBLIC_KEY); // استبدل هذا برقمك الحقيق
             }
         }
 
+        // دالة إرسال الطلب عبر البريد الإلكتروني
         function sendOrder() {
             const rawName = document.getElementById('cust-name').value;
             const rawPhone = document.getElementById('cust-phone').value;
@@ -483,31 +487,42 @@ emailjs.init(EMAILJS_PUBLIC_KEY); // استبدل هذا برقمك الحقيق
             let subtotal = 0;
             for (let item in cart) {
                 const itemTotal = cart[item].price * cart[item].qty;
-                itemsText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه%0A`;
+                itemsText += `- ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه\n`;
                 subtotal += itemTotal;
             }
 
-            const deliveryFee = "حسب المنطقة";
-// إعداد البيانات للإرسال عبر EmailJS
-    const templateParams = {
-      cust_name: name,
-      cust_phone: phone,
-      cust_address: fullAddress,
-      order_items: itemsText,
-      total_price: subtotal
-    };
+            // إرسال البيانات إلى EmailJS
+            const sendBtn = document.getElementById('send-btn');
+            sendBtn.innerText = "جاري الإرسال...";
+            sendBtn.disabled = true;
 
-    // إرسال الإيميل
-    emailjs.send("service_ofjx955", "template_xat6xes", templateParams)
-      .then(function() {
-        showAlert("تم إرسال طلبك بنجاح! شكراً لتسوقك من لُبّ.");
-        cart = {};
-        if (typeof updateCart === 'function') updateCart();
-      }, function(error) {
-        showAlert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.");
-        console.error("EmailJS Error:", error);
-      });
-            
+            const templateParams = {
+                cust_name: name,
+                cust_phone: phone || 'غير مدخل',
+                cust_address: fullAddress || 'غير مدخل',
+                order_items: itemsText,
+                total_price: `${subtotal} جنيه`
+            };
+
+            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
+                .then(function() {
+                    showAlert('تم إرسال طلبك بنجاح! شكراً لتسوقك من لُبّ.');
+                    cart = {};
+                    calculateTotal();
+                    renderProducts();
+                    document.getElementById('cust-name').value = '';
+                    document.getElementById('cust-phone').value = '';
+                    document.getElementById('cust-address').value = '';
+                    sendBtn.innerText = "إرسال الطلب 📧";
+                    sendBtn.disabled = false;
+                }, function(error) {
+                    showAlert('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.');
+                    console.error('EmailJS Error:', error);
+                    sendBtn.innerText = "إرسال الطلب 📧";
+                    sendBtn.disabled = false;
+                });
+        }
+
         function showAlert(msg) {
             document.getElementById('modal-text').innerText = msg;
             document.getElementById('alert-modal').style.display = 'flex';
@@ -521,14 +536,5 @@ emailjs.init(EMAILJS_PUBLIC_KEY); // استبدل هذا برقمك الحقيق
             navigator.serviceWorker.register('/sw.js').catch(() => {});
         }
     </script>
-<!-- EmailJS SDK -->
-<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-
-<script>
-  // تهيئة مفاتيح EmailJS
-  (function() {
-    emailjs.init("GmJXhbuFZa7wFxvn_");
-  })();
-</script>
 </body>
 </html>
