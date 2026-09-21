@@ -84,6 +84,19 @@
 
         @keyframes fadeIn { to { opacity: 1; } }
 
+        /* --- شريط حالة المحل --- */
+        #shop-status-banner {
+            text-align: center;
+            padding: 10px;
+            font-weight: bold;
+            border-radius: 8px;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            display: none;
+        }
+        .status-open { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
+        .status-closed { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
+
         /* --- الهيدر --- */
         header {
             text-align: center;
@@ -236,6 +249,12 @@
             cursor: pointer;
         }
 
+        .send-btn:disabled {
+            background: #555;
+            color: #888;
+            cursor: not-allowed;
+        }
+
         .modal {
             display: none;
             position: fixed;
@@ -284,6 +303,9 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
+    <!-- شريط حالة المحل (مفتوح / مغلق) -->
+    <div id="shop-status-banner">جاري التحقق من حالة المحل...</div>
+
     <!-- عرض الاصناف -->
     <div id="products-container"></div>
 
@@ -324,7 +346,9 @@
     <script>
         const EMAILJS_PUBLIC_KEY = "GmJXhbuFZa7wFxvn_";
         const EMAILJS_SERVICE_ID = "service_ofjx955";
-        const EMAILJS_TEMPLATE_ID = "template_saoi5q6"; // تم تعديله للـ ID الصحيح من صورتك
+        const EMAILJS_TEMPLATE_ID = "template_saoi5q6";
+
+        let isShopOpen = true; // الحالة الافتراضية
 
         (function() {
             emailjs.init(EMAILJS_PUBLIC_KEY);
@@ -338,8 +362,39 @@
                     intro.style.visibility = 'hidden';
                 }
             }, 2200);
+            
+            checkShopStatus();
             renderProducts();
         });
+
+        // التحقق من حالة المحل من ملف status.json على GitHub
+        async function checkShopStatus() {
+            const banner = document.getElementById('shop-status-banner');
+            const sendBtn = document.getElementById('send-btn');
+            
+            try {
+                // إضافة timestamp عشوائي لمنع الـ Cache
+                const response = await fetch('./status.json?t=' + new Date().getTime());
+                const data = await response.json();
+                isShopOpen = data.isOpen;
+
+                banner.style.display = 'block';
+                if (isShopOpen) {
+                    banner.className = 'shop-status-banner status-open';
+                    banner.innerText = '🟢 المحل مفتوح ويستقبل طلباتكم الآن';
+                    sendBtn.disabled = false;
+                    sendBtn.innerText = 'إرسال الطلب 📧';
+                } else {
+                    banner.className = 'shop-status-banner status-closed';
+                    banner.innerText = '🔴 نعتذر، المحل مغلق مؤقتاً ولا نستقبل طلبات الآن';
+                    sendBtn.disabled = true;
+                    sendBtn.innerText = 'المحل مغلق حالياً ⛔';
+                }
+            } catch (e) {
+                // لو حصل خطأ في جلب الملف, افتراضيًا نسمح بالطلب
+                banner.style.display = 'none';
+            }
+        }
 
         const productsData = [
             {
@@ -409,6 +464,11 @@
         }
 
         function updateQty(product, size, price, change) {
+            if (!isShopOpen) {
+                showAlert('المحل مغلق حالياً، لا يمكن إضافة منتجات للسلة.');
+                return;
+            }
+
             const key = `${product} - ${size}`;
             
             if (!cart[key]) {
@@ -434,6 +494,7 @@
         }
 
         function getLocation() {
+            if (!isShopOpen) return;
             const btn = document.getElementById('location-btn');
             btn.innerText = 'جاري تحديد الموقع...';
 
@@ -457,6 +518,11 @@
         }
 
         function sendOrder() {
+            if (!isShopOpen) {
+                showAlert('عذراً، المحل مغلق ولا يمكن إرسال الطلبات الآن.');
+                return;
+            }
+
             const rawName = document.getElementById('cust-name').value;
             const rawPhone = document.getElementById('cust-phone').value;
             const rawAddress = document.getElementById('cust-address').value;
