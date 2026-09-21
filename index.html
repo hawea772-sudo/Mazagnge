@@ -510,5 +510,14 @@
             navigator.serviceWorker.register('/sw.js').catch(() => {});
         }
     </script>
+<!-- EmailJS SDK -->
+<script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+
+<script>
+  // تهيئة مفاتيح EmailJS
+  (function() {
+    emailjs.init("GmJXhbuFZa7wFxvn_");
+  })();
+</script>
 </body>
 </html>
