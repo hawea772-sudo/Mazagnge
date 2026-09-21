@@ -321,7 +321,12 @@
 
     <script>
         // إدخال رقم الواتساب الثابت الخاص بك هنا بشكل آمن دون إتاحة تعديله محلّياً
-        const SYSTEM_WHATSAPP_NUMBER = "201000000000"; // استبدل هذا برقمك الحقيقي برمز الدولة بدون +
+        const EMAILJS_PUBLIC_KEY = "GmJXhbuFZa7wFxvn_";
+const EMAILJS_SERVICE_ID = "service_ofjx955";
+const EMAILJS_TEMPLATE_ID = "template_xat6xes";
+
+// تهيئة الخدمة
+emailjs.init(EMAILJS_PUBLIC_KEY); // استبدل هذا برقمك الحقيقي برمز الدولة بدون +
 
         window.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => {
@@ -483,20 +488,26 @@
             }
 
             const deliveryFee = "حسب المنطقة";
+// إعداد البيانات للإرسال عبر EmailJS
+    const templateParams = {
+      cust_name: name,
+      cust_phone: phone,
+      cust_address: fullAddress,
+      order_items: itemsText,
+      total_price: subtotal
+    };
 
-            let orderText = `🌻 *طلب جديد من تطبيق "لُـبّ"* 🌻%0A%0A`;
-            orderText += `👤 *العميل:* ${encodeURIComponent(name)}%0A`;
-            orderText += `📞 *الهاتف:* ${encodeURIComponent(phone || 'غير مدخل')}%0A`;
-            orderText += `📍 *العنوان:* ${encodeURIComponent(fullAddress || 'غير مدخل')}%0A%0A`;
-            orderText += `📦 *تفاصيل المشتريات:*%0A${itemsText}%0A`;
-            orderText += `💵 *سعر المشتريات:* ${subtotal} جنيه%0A`;
-            orderText += `🛵 *خدمة التوصيل:* ${deliveryFee}%0A`;
-            orderText += `💰 *الإجمالي الكلي:* ${subtotal} جنيه%0A%0A`;
-            orderText += `برجاء التأكيد وتحديد موعد التسليم.`;
-
-            window.open(`https://wa.me/${SYSTEM_WHATSAPP_NUMBER}?text=${orderText}`, '_blank');
-        }
-
+    // إرسال الإيميل
+    emailjs.send("service_ofjx955", "template_xat6xes", templateParams)
+      .then(function() {
+        showAlert("تم إرسال طلبك بنجاح! شكراً لتسوقك من لُبّ.");
+        cart = {};
+        if (typeof updateCart === 'function') updateCart();
+      }, function(error) {
+        showAlert("حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.");
+        console.error("EmailJS Error:", error);
+      });
+            
         function showAlert(msg) {
             document.getElementById('modal-text').innerText = msg;
             document.getElementById('alert-modal').style.display = 'flex';
