@@ -406,6 +406,12 @@
         <input type="tel" id="cust-phone" maxlength="15" placeholder="اكتب رقم الهاتف..." autocomplete="tel">
     </div>
 
+    <!-- 👈 تم إضافة حقل تبع مين هنا -->
+    <div class="input-group">
+        <label for="cust-referred">تبع مين؟ (الجهة / اسم الشخص)</label>
+        <input type="text" id="cust-referred" maxlength="50" placeholder="جاي من طرف مين أو تبع جهة إيه؟">
+    </div>
+
     <div class="input-group">
         <label for="cust-address">العنوان التفصيلي</label>
         <input type="text" id="cust-address" maxlength="150" placeholder="اسم الشارع - رقم العمارة - الدور" autocomplete="street-address">
@@ -426,7 +432,7 @@
     </div>
 
     <script>
-        // --- 🔐 كلمة السر الجديدة ---
+        // --- 🔐 كلمة السر ---
         const APP_PASSWORD = "01090";
 
         function checkPassword() {
@@ -632,6 +638,7 @@
 
             const name = sanitizeInput(document.getElementById('cust-name').value);
             const phone = sanitizeInput(document.getElementById('cust-phone').value);
+            const referredBy = sanitizeInput(document.getElementById('cust-referred').value);
             const address = sanitizeInput(document.getElementById('cust-address').value);
 
             if (Object.keys(cart).length === 0) {
@@ -661,9 +668,11 @@
             sendBtn.innerText = "جاري الإرسال...";
             sendBtn.disabled = true;
 
+            // تم إضافة cust_referred هنا لتصلك في الإيميل
             const templateParams = {
                 cust_name: name,
                 cust_phone: phone || 'غير مدخل',
+                cust_referred: referredBy || 'غير مدخل',
                 cust_address: fullAddress || 'غير مدخل',
                 order_items: itemsText,
                 total_price: `${subtotal} جنيه`
@@ -677,6 +686,7 @@
                     renderProducts();
                     document.getElementById('cust-name').value = '';
                     document.getElementById('cust-phone').value = '';
+                    document.getElementById('cust-referred').value = '';
                     document.getElementById('cust-address').value = '';
                     sendBtn.innerText = "إرسال الطلب 📧";
                     sendBtn.disabled = false;
