@@ -55,8 +55,8 @@
 
         /* --- زر وسجل الطلبات --- */
         .my-orders-btn {
-            width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid var(--accent-color);
-            color: var(--accent-color); border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer;
+            width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid var(--accent-color);
+            color: var(--accent-color); border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer; font-size: 1rem;
         }
 
         .orders-modal {
@@ -78,7 +78,7 @@
         .status-accepted { color: #2ecc71; font-weight: bold; }
         .status-rejected { color: #e74c3c; font-weight: bold; }
 
-        /* --- باقي التنسيقات --- */
+        /* --- المنتجات والنموذج --- */
         .product-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .product-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 12px; }
         .size-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
@@ -92,7 +92,7 @@
     </style>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <!-- Firebase SDK -->
+    <!-- Firebase SDK (لحفظ حالة الطلب مجانًا وبدون سيرفر) -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
@@ -113,8 +113,8 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- زر عرض طلباتي -->
-    <button class="my-orders-btn" onclick="openOrdersModal()">📦 متابعة طلباتي وموقفهما</button>
+    <!-- زر متابعة الطلبات -->
+    <button class="my-orders-btn" onclick="openOrdersModal()">📦 متابعة حالة طلباتي</button>
 
     <div id="products-container"></div>
 
@@ -132,14 +132,14 @@
     <!-- نافذة متابعة الطلبات للعميل -->
     <div class="orders-modal" id="orders-modal">
         <div class="orders-content">
-            <h3 style="color: var(--accent-color); margin-bottom: 15px;">قائمة طلباتك</h3>
-            <div id="orders-list-container">لا يوجد طلبات سابقة.</div>
+            <h3 style="color: var(--accent-color); margin-bottom: 15px;">حالة طلباتك</h3>
+            <div id="orders-list-container">لا يوجد طلبات حالياً.</div>
             <button onclick="closeOrdersModal()" style="margin-top: 15px; width: 100%; padding: 10px; background: var(--accent-color); border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">إغلاق</button>
         </div>
     </div>
 
     <script>
-        // --- 🔐 كلمة السر ---
+        // --- 🔐 الحماية ---
         const APP_PASSWORD = "01090";
         function checkPassword() {
             if (document.getElementById('app-pass-input').value === APP_PASSWORD) {
@@ -151,9 +151,9 @@
             document.getElementById('auth-overlay').style.display = 'none';
         }
 
-        // --- 🔑 إعدادات Firebase السحابية ---
+        // --- 🔑 إعدادات Firebase السحابية لحفظ قبول/رفض الطلبات ---
         const firebaseConfig = {
-            databaseURL: "https://labb-store-default-rtdb.firebaseio.com" // يمكنك إنشاء قاعدة بيانات مجانية على Firebase وحط رابطها هنا
+            databaseURL: "https://labb-store-default-rtdb.firebaseio.com"
         };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
@@ -172,9 +172,9 @@
         function renderProducts() {
             const container = document.getElementById('products-container');
             container.innerHTML = '';
-            productsData.forEach((prod, pIdx) => {
+            productsData.forEach((prod) => {
                 let html = `<div class="product-card"><div class="product-title">${prod.name}</div>`;
-                prod.sizes.forEach((sz, sIdx) => {
+                prod.sizes.forEach((sz) => {
                     const key = `${prod.name} - ${sz.name}`;
                     const qty = cart[key] ? cart[key].qty : 0;
                     html += `
@@ -203,7 +203,7 @@
             renderProducts();
         }
 
-        // --- إرسال الطلب وحفظه ---
+        // --- إرسال الطلب ---
         function sendOrder() {
             const name = document.getElementById('cust-name').value;
             const phone = document.getElementById('cust-phone').value;
@@ -224,7 +224,7 @@
                 total += sub;
             }
 
-            // رابط التحكم بالطلب من الجيميل
+            // رابط تحديث الحالة فقط من الجيميل
             const siteUrl = window.location.href.split('?')[0];
             const acceptUrl = `${siteUrl}?action=update_status&order_id=${orderId}&status=accepted`;
             const rejectUrl = `${siteUrl}?action=update_status&order_id=${orderId}&status=rejected`;
@@ -232,24 +232,20 @@
             const orderData = {
                 id: orderId,
                 name: name,
-                phone: phone || 'غير مدخل',
-                referred: referred || 'غير مدخل',
-                address: address || 'غير مدخل',
-                items: itemsText,
                 total: `${total} جنيه`,
-                status: 'pending', // حالة مبدئية: قيد الانتظار
-                date: new Date().toLocaleString('ar-EG')
+                status: 'pending', // قيد الانتظار
+                date: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
             };
 
             // 1. حفظ الطلب في Firebase
             database.ref('orders/' + orderId).set(orderData);
 
-            // 2. حفظ رقم الطلب في جهاز العميل
+            // 2. حفظ رقم الطلب في متصفح العميل
             let myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
             myOrders.push(orderId);
             localStorage.setItem('my_orders', JSON.stringify(myOrders));
 
-            // 3. إرسال الإيميل
+            // 3. إرسال الإيميل إليك
             const templateParams = {
                 order_id: orderId,
                 cust_name: name,
@@ -263,13 +259,13 @@
             };
 
             emailjs.send("service_ofjx955", "template_6zol2ee", templateParams).then(() => {
-                alert(`تم إرسال طلبك بنجاح! رقم طلبك هو (${orderId}). يمكنك متابعة حالته من زر "طلباتي".`);
+                alert(`تم إرسال طلبك بنجاح! رقم الطلب (${orderId}). يمكنك متابعة حالته من زر "متابعة حالة طلباتي".`);
                 cart = {};
                 renderProducts();
             });
         }
 
-        // --- التحكم بحالة الطلب عند فتح الرابط من الإيميل ---
+        // --- التماثل عند ضغطك على رابط الإيميل ---
         window.addEventListener('DOMContentLoaded', () => {
             renderProducts();
             const urlParams = new URLSearchParams(window.location.search);
@@ -277,29 +273,30 @@
             const orderId = urlParams.get('order_id');
             const status = urlParams.get('status');
 
+            // إذا دخلت أنت عبر رابط القبول أو الرفض في الإيميل
             if (action === 'update_status' && orderId && status) {
                 database.ref('orders/' + orderId).update({ status: status }).then(() => {
                     if (status === 'accepted') {
-                        alert(`✅ تم قبول الطلب رقم ${orderId} بنجاح!`);
+                        alert(`✅ تم تحديث الطلب (${orderId}) إلى: تم القبول.`);
                     } else if (status === 'rejected') {
-                        alert(`❌ تم تغيير حالة الطلب رقم ${orderId} إلى "تم الرفض".`);
+                        alert(`❌ تم تحديث الطلب (${orderId}) إلى: تم الرفض.`);
                     }
                 });
             }
         });
 
-        // --- عرض قائمة طلبات العميل ---
+        // --- عرض حالة الطلبات للعميل ---
         function openOrdersModal() {
             document.getElementById('orders-modal').style.display = 'flex';
             const container = document.getElementById('orders-list-container');
             const myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
 
             if (myOrders.length === 0) {
-                container.innerHTML = "لا توجد طلبات سابقة.";
+                container.innerHTML = "لا يوجد لديك طلبات سابقة.";
                 return;
             }
 
-            container.innerHTML = "جاري تحميل حالة الطلبات...";
+            container.innerHTML = "جاري التحقق من حالة الطلبات...";
 
             let html = "";
             myOrders.forEach(id => {
@@ -310,7 +307,7 @@
                         let statusClass = "status-pending";
 
                         if (data.status === 'accepted') {
-                            statusTxt = "🟢 تم قبول الطلب وتجهيزه";
+                            statusTxt = "🟢 تم قبول الطلب";
                             statusClass = "status-accepted";
                         } else if (data.status === 'rejected') {
                             statusTxt = "🔴 تم رفض الطلب";
@@ -320,9 +317,9 @@
                         html += `
                             <div class="order-item-card">
                                 <div><b>رقم الطلب:</b> ${data.id}</div>
-                                <div><b>التاريخ:</b> ${data.date}</div>
+                                <div><b>الوقت:</b> ${data.date}</div>
                                 <div><b>الإجمالي:</b> ${data.total}</div>
-                                <div style="margin-top:5px;"><b>الحالة:</b> <span class="${statusClass}">${statusTxt}</span></div>
+                                <div style="margin-top:5px;"><b>حالة الطلب:</b> <span class="${statusClass}">${statusTxt}</span></div>
                             </div>`;
                         container.innerHTML = html;
                     }
