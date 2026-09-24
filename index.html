@@ -28,7 +28,7 @@
 
         input, button { font-size: 16px !important; }
 
-        /* --- شاشة الحماية بالباسورد --- */
+        /* --- شاشة الحماية العامة للموقع --- */
         #auth-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #121212; display: flex; flex-direction: column;
@@ -53,18 +53,20 @@
         header { text-align: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
         header h1 { color: var(--accent-color); }
 
-        /* --- زر وسجل الطلبات --- */
-        .my-orders-btn {
-            width: 100%; padding: 12px; background: #2a2a2a; border: 1px solid var(--accent-color);
-            color: var(--accent-color); border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer; font-size: 1rem;
+        /* --- الأزرار العلوية --- */
+        .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
+        .top-btn {
+            flex: 1; padding: 12px; background: #2a2a2a; border: 1px solid var(--accent-color);
+            color: var(--accent-color); border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 0.95rem;
         }
 
-        .orders-modal {
+        /* --- النوافذ المنبثقة (Modals) --- */
+        .modal {
             display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
             background: rgba(0,0,0,0.85); z-index: 10002; padding: 20px; justify-content: center; align-items: center;
         }
 
-        .orders-content {
+        .modal-content {
             background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
             width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; padding: 15px;
         }
@@ -89,16 +91,21 @@
         .input-group input { width: 100%; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; }
         .footer-cart { position: sticky; bottom: 10px; background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .send-btn { background: var(--accent-color); color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
+
+        /* أزرار لوحة التحكم للأدمن */
+        .admin-action-btns { display: flex; gap: 8px; margin-top: 10px; }
+        .btn-acc { background: #2ecc71; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
+        .btn-rej { background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
     </style>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <!-- Firebase SDK (لحفظ حالة الطلب مجانًا وبدون سيرفر) -->
+    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <!-- شاشة كلمة السر -->
+    <!-- شاشة كلمة السر العامة للمتجر -->
     <div id="auth-overlay">
         <div class="auth-card">
             <h3>🔒 التطبيق محمي</h3>
@@ -108,13 +115,36 @@
         </div>
     </div>
 
+    <!-- نافذة تسجيل دخول الأدمن الخاصة بك -->
+    <div class="modal" id="admin-login-modal">
+        <div class="modal-content" style="text-align: center;">
+            <h3 style="color: var(--accent-color); margin-bottom: 15px;">🔐 لوحة تحكم الأدمن</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">أدخل كلمة سر الأدمن الخاصة بك لإدارة الطلبات</p>
+            <input type="password" id="admin-pass-input" placeholder="كلمة السر الخاصة بك" style="width: 100%; padding: 12px; background: #121212; border: 1px solid var(--border-color); color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px;">
+            <button onclick="verifyAdmin()" style="width: 100%; padding: 12px; background: var(--accent-color); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">دخول للوحة التحكم</button>
+            <button onclick="document.getElementById('admin-login-modal').style.display='none'" style="width: 100%; padding: 8px; background: transparent; color: var(--text-secondary); border: none; margin-top: 10px; cursor: pointer;">إلغاء</button>
+        </div>
+    </div>
+
+    <!-- نافذة عرض الطلبات للأدمن -->
+    <div class="modal" id="admin-orders-modal">
+        <div class="modal-content">
+            <h3 style="color: var(--accent-color); margin-bottom: 15px;">📋 إدارة طلبات العملاء (الأدمن)</h3>
+            <div id="admin-orders-container">جاري التحميل...</div>
+            <button onclick="document.getElementById('admin-orders-modal').style.display='none'" style="margin-top: 15px; width: 100%; padding: 10px; background: #333; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">إغلاق لوحة التحكم</button>
+        </div>
+    </div>
+
     <header>
         <h1>لُبّ - Labb</h1>
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <!-- زر متابعة الطلبات -->
-    <button class="my-orders-btn" onclick="openOrdersModal()">📦 متابعة حالة طلباتي</button>
+    <!-- أزرار المتابعة ولوحة التحكم -->
+    <div class="btn-group">
+        <button class="top-btn" onclick="openOrdersModal()">📦 متابعة طلباتي</button>
+        <button class="top-btn" onclick="openAdminDashboard()" style="border-color: #e74c3c; color: #e74c3c;">⚙️ لوحة الأدمن</button>
+    </div>
 
     <div id="products-container"></div>
 
@@ -130,28 +160,32 @@
     </div>
 
     <!-- نافذة متابعة الطلبات للعميل -->
-    <div class="orders-modal" id="orders-modal">
-        <div class="orders-content">
+    <div class="modal" id="orders-modal">
+        <div class="modal-content">
             <h3 style="color: var(--accent-color); margin-bottom: 15px;">حالة طلباتك</h3>
-            <div id="orders-list-container">لا يوجد طلبات حالياً.</div>
+            <div id="orders-list-container">لا يوجد لديك طلبات سابقة.</div>
             <button onclick="closeOrdersModal()" style="margin-top: 15px; width: 100%; padding: 10px; background: var(--accent-color); border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">إغلاق</button>
         </div>
     </div>
 
     <script>
         // --- 🔐 الحماية ---
-        const APP_PASSWORD = "01090";
+        const APP_PASSWORD = "01090"; // كلمة سر المتجر العامة
+        const ADMIN_PASSWORD = "admin123"; // 🔑 ضع هنا كلمة السر الخاصة بك لدخول لوحة التحكم (يمكنك تغييرها)
+
         function checkPassword() {
             if (document.getElementById('app-pass-input').value === APP_PASSWORD) {
                 document.getElementById('auth-overlay').style.display = 'none';
                 sessionStorage.setItem('app_authenticated', 'true');
+            } else {
+                alert('كلمة السر غير صحيحة');
             }
         }
         if (sessionStorage.getItem('app_authenticated') === 'true') {
             document.getElementById('auth-overlay').style.display = 'none';
         }
 
-        // --- 🔑 إعدادات Firebase السحابية لحفظ قبول/رفض الطلبات ---
+        // --- 🔑 إعدادات Firebase السحابية ---
         const firebaseConfig = {
             databaseURL: "https://labb-store-default-rtdb.firebaseio.com"
         };
@@ -224,14 +258,13 @@
                 total += sub;
             }
 
-            // رابط تحديث الحالة فقط من الجيميل
-            const siteUrl = window.location.href.split('?')[0];
-            const acceptUrl = `${siteUrl}?action=update_status&order_id=${orderId}&status=accepted`;
-            const rejectUrl = `${siteUrl}?action=update_status&order_id=${orderId}&status=rejected`;
-
             const orderData = {
                 id: orderId,
                 name: name,
+                phone: phone || 'غير مدخل',
+                referred: referred || 'غير مدخل',
+                address: address || 'غير مدخل',
+                items: itemsText,
                 total: `${total} جنيه`,
                 status: 'pending', // قيد الانتظار
                 date: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
@@ -245,7 +278,7 @@
             myOrders.push(orderId);
             localStorage.setItem('my_orders', JSON.stringify(myOrders));
 
-            // 3. إرسال الإيميل إليك
+            // 3. إرسال الإيميل إليك للتنبيه فقط
             const templateParams = {
                 order_id: orderId,
                 cust_name: name,
@@ -253,36 +286,18 @@
                 cust_referred: referred || 'غير مدخل',
                 cust_address: address || 'غير مدخل',
                 order_items: itemsText,
-                total_price: `${total} جنيه`,
-                accept_url: acceptUrl,
-                reject_url: rejectUrl
+                total_price: `${total} جنيه`
             };
 
             emailjs.send("service_ofjx955", "template_6zol2ee", templateParams).then(() => {
-                alert(`تم إرسال طلبك بنجاح! رقم الطلب (${orderId}). يمكنك متابعة حالته من زر "متابعة حالة طلباتي".`);
+                alert(`تم إرسال طلبك بنجاح! رقم الطلب (${orderId}). يمكنك متابعة حالته من زر "متابعة طلباتي".`);
                 cart = {};
                 renderProducts();
             });
         }
 
-        // --- التماثل عند ضغطك على رابط الإيميل ---
         window.addEventListener('DOMContentLoaded', () => {
             renderProducts();
-            const urlParams = new URLSearchParams(window.location.search);
-            const action = urlParams.get('action');
-            const orderId = urlParams.get('order_id');
-            const status = urlParams.get('status');
-
-            // إذا دخلت أنت عبر رابط القبول أو الرفض في الإيميل
-            if (action === 'update_status' && orderId && status) {
-                database.ref('orders/' + orderId).update({ status: status }).then(() => {
-                    if (status === 'accepted') {
-                        alert(`✅ تم تحديث الطلب (${orderId}) إلى: تم القبول.`);
-                    } else if (status === 'rejected') {
-                        alert(`❌ تم تحديث الطلب (${orderId}) إلى: تم الرفض.`);
-                    }
-                });
-            }
         });
 
         // --- عرض حالة الطلبات للعميل ---
@@ -307,7 +322,7 @@
                         let statusClass = "status-pending";
 
                         if (data.status === 'accepted') {
-                            statusTxt = "🟢 تم قبول الطلب";
+                            statusTxt = "🟢 تم قبول الطلب وتجهيزه";
                             statusClass = "status-accepted";
                         } else if (data.status === 'rejected') {
                             statusTxt = "🔴 تم رفض الطلب";
@@ -329,6 +344,74 @@
 
         function closeOrdersModal() {
             document.getElementById('orders-modal').style.display = 'none';
+        }
+
+        // --- ⚙️ لوحة تحكم الأدمن (التحكم السريع بضغطة زر) ---
+        function openAdminDashboard() {
+            if (sessionStorage.getItem('admin_authenticated') === 'true') {
+                loadAdminOrders();
+            } else {
+                document.getElementById('admin-login-modal').style.display = 'flex';
+            }
+        }
+
+        function verifyAdmin() {
+            const pass = document.getElementById('admin-pass-input').value;
+            if (pass === ADMIN_PASSWORD) {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                document.getElementById('admin-login-modal').style.display = 'none';
+                loadAdminOrders();
+            } else {
+                alert('كلمة سر الأدمن غير صحيحة!');
+            }
+        }
+
+        function loadAdminOrders() {
+            document.getElementById('admin-orders-modal').style.display = 'flex';
+            const container = document.getElementById('admin-orders-container');
+            container.innerHTML = "جاري جلب الطلبات الواردة...";
+
+            database.ref('orders').limitToLast(15).once('value').then(snapshot => {
+                const orders = snapshot.val();
+                if (!orders) {
+                    container.innerHTML = "لا توجد طلبات مسجلة حتى الآن.";
+                    return;
+                }
+
+                let html = "";
+                // عكس ترتيب الطلبات ليظهر الجديد في الأعلى
+                const keys = Object.keys(orders).reverse();
+                keys.forEach(key => {
+                    const ord = orders[key];
+                    let currentStatus = "قيد الانتظار ⏳";
+                    if (ord.status === 'accepted') currentStatus = "مقبول 🟢";
+                    if (ord.status === 'rejected') currentStatus = "مرفوض 🔴";
+
+                    html += `
+                        <div class="order-item-card">
+                            <div><b>الرقم:</b> ${ord.id} | <b>الاسم:</b> ${ord.name}</div>
+                            <div><b>الهاتف:</b> ${ord.phone}</div>
+                            <div><b>العنوان:</b> ${ord.address}</div>
+                            <div><b>تابع لمن:</b> ${ord.referred}</div>
+                            <div style="background:#1a1a1a; padding:6px; border-radius:4px; margin:5px 0; white-space:pre-line;">${ord.items}</div>
+                            <div><b>الإجمالي:</b> ${ord.total}</div>
+                            <div><b>الحالة الحالية:</b> <b>${currentStatus}</b></div>
+                            <div class="admin-action-btns">
+                                <button class="btn-acc" onclick="updateOrderStatus('${ord.id}', 'accepted')">✅ قبول</button>
+                                <button class="btn-rej" onclick="updateOrderStatus('${ord.id}', 'rejected')">❌ رفض</button>
+                            </div>
+                        </div>`;
+                });
+                container.innerHTML = html;
+            });
+        }
+
+        // تحديث حالة الطلب فوراً لتظهر للعميل في الحال
+        function updateOrderStatus(orderId, newStatus) {
+            database.ref('orders/' + orderId).update({ status: newStatus }).then(() => {
+                alert(`تم تحديث الطلب (${orderId}) بنجاح وظهر للعميل فوراً!`);
+                loadAdminOrders(); // تحديث القائمة أمامك
+            });
         }
     </script>
 </body>
