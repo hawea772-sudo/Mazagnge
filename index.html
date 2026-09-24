@@ -28,7 +28,7 @@
 
         input, button { font-size: 16px !important; }
 
-        /* --- شاشة الحماية العامة للموقع --- */
+        /* --- شاشة حماية الموقع العامة للعملاء --- */
         #auth-overlay {
             position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
             background-color: #121212; display: flex; flex-direction: column;
@@ -51,9 +51,8 @@
         }
 
         header { text-align: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
-        header h1 { color: var(--accent-color); }
+        header h1 { color: var(--accent-color); cursor: pointer; } /* الضغط هنا يفتح لوحة المطور لو عرف السر */
 
-        /* --- الأزرار العلوية --- */
         .btn-group { display: flex; gap: 10px; margin-bottom: 15px; }
         .top-btn {
             flex: 1; padding: 12px; background: #2a2a2a; border: 1px solid var(--accent-color);
@@ -80,7 +79,6 @@
         .status-accepted { color: #2ecc71; font-weight: bold; }
         .status-rejected { color: #e74c3c; font-weight: bold; }
 
-        /* --- المنتجات والنموذج --- */
         .product-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); }
         .product-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 12px; }
         .size-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
@@ -92,20 +90,18 @@
         .footer-cart { position: sticky; bottom: 10px; background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
         .send-btn { background: var(--accent-color); color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
 
-        /* أزرار لوحة التحكم للأدمن */
         .admin-action-btns { display: flex; gap: 8px; margin-top: 10px; }
         .btn-acc { background: #2ecc71; color: #000; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
         .btn-rej { background: #e74c3c; color: #fff; border: none; padding: 6px 12px; border-radius: 6px; font-weight: bold; cursor: pointer; flex: 1; }
     </style>
 
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
-    <!-- Firebase SDK -->
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
     <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
-    <!-- شاشة كلمة السر العامة للمتجر -->
+    <!-- شاشة كلمة السر العامة لدخول المتجر للعملاء -->
     <div id="auth-overlay">
         <div class="auth-card">
             <h3>🔒 التطبيق محمي</h3>
@@ -115,48 +111,29 @@
         </div>
     </div>
 
-    <!-- نافذة تسجيل دخول الأدمن الخاصة بك -->
-    <div class="modal" id="admin-login-modal">
+    <!-- نافذة سرية لتسجيل دخول المطور (تفتح عند الضغط على عنوان الموقع) -->
+    <div class="modal" id="dev-login-modal">
         <div class="modal-content" style="text-align: center;">
-            <h3 style="color: var(--accent-color); margin-bottom: 15px;">🔐 لوحة تحكم الأدمن</h3>
-            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">أدخل كلمة سر الأدمن الخاصة بك لإدارة الطلبات</p>
-            <input type="password" id="admin-pass-input" placeholder="كلمة السر الخاصة بك" style="width: 100%; padding: 12px; background: #121212; border: 1px solid var(--border-color); color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px;">
-            <button onclick="verifyAdmin()" style="width: 100%; padding: 12px; background: var(--accent-color); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">دخول للوحة التحكم</button>
-            <button onclick="document.getElementById('admin-login-modal').style.display='none'" style="width: 100%; padding: 8px; background: transparent; color: var(--text-secondary); border: none; margin-top: 10px; cursor: pointer;">إلغاء</button>
+            <h3 style="color: var(--accent-color); margin-bottom: 15px;">⚙️ لوحة تحكم المطور</h3>
+            <p style="font-size: 0.9rem; color: var(--text-secondary); margin-bottom: 15px;">أدخل كلمة سر المطور لتعديل الأسعار وإدارة الطلبات</p>
+            <input type="password" id="dev-pass-input" placeholder="كلمة سر المطور" style="width: 100%; padding: 12px; background: #121212; border: 1px solid var(--border-color); color: #fff; border-radius: 8px; text-align: center; margin-bottom: 15px;">
+            <button onclick="verifyDev()" style="width: 100%; padding: 12px; background: var(--accent-color); color: #000; border: none; border-radius: 8px; font-weight: bold; cursor: pointer;">فتح لوحة التحكم</button>
+            <button onclick="document.getElementById('dev-login-modal').style.display='none'" style="width: 100%; padding: 8px; background: transparent; color: var(--text-secondary); border: none; margin-top: 10px; cursor: pointer;">إلغاء</button>
         </div>
     </div>
 
-    <!-- نافذة عرض الطلبات للأدمن -->
-    <div class="modal" id="admin-orders-modal">
+    <!-- لوحة تحكم المطور المخفية (لتعديل الأسعار وإدارة الطلبات فورياً) -->
+    <div class="modal" id="dev-dashboard-modal">
         <div class="modal-content">
-            <h3 style="color: var(--accent-color); margin-bottom: 15px;">📋 إدارة طلبات العملاء (الأدمن)</h3>
-            <div id="admin-orders-container">جاري التحميل...</div>
-            <button onclick="document.getElementById('admin-orders-modal').style.display='none'" style="margin-top: 15px; width: 100%; padding: 10px; background: #333; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">إغلاق لوحة التحكم</button>
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">🛠️ تعديل الأسعار الفورية</h3>
+            <p style="font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 15px;">أي تعديل هنا يظهر للعملاء في الحال.</p>
+            <div id="prices-editor-container" style="margin-bottom: 20px;">جاري التحميل...</div>
+            <button onclick="saveNewPrices()" style="width: 100%; padding: 10px; background: #2ecc71; color: #000; border: none; border-radius: 6px; font-weight: bold; cursor: pointer; margin-bottom: 20px;">💾 حفظ وتحديث الأسعار للجميع</button>
+
+            <h3 style="color: var(--accent-color); margin-bottom: 10px;">📦 الطلبات الواردة</h3>
+            <div id="dev-orders-container">جاري جلب الطلبات...</div>
+            <button onclick="document.getElementById('dev-dashboard-modal').style.display='none'" style="margin-top: 15px; width: 100%; padding: 10px; background: #333; color: #fff; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">إغلاق لوحة التحكم</button>
         </div>
-    </div>
-
-    <header>
-        <h1>لُبّ - Labb</h1>
-        <p>أسهل طريقة لطلب التسالي</p>
-    </header>
-
-    <!-- أزرار المتابعة ولوحة التحكم -->
-    <div class="btn-group">
-        <button class="top-btn" onclick="openOrdersModal()">📦 متابعة طلباتي</button>
-        <button class="top-btn" onclick="openAdminDashboard()" style="border-color: #e74c3c; color: #e74c3c;">⚙️ لوحة الأدمن</button>
-    </div>
-
-    <div id="products-container"></div>
-
-    <div style="color: var(--accent-color); font-weight: bold; margin: 15px 0 10px;">👤 بيانات التوصيل</div>
-    <div class="input-group"><label>الاسم بالكامل</label><input type="text" id="cust-name" required></div>
-    <div class="input-group"><label>رقم الهاتف</label><input type="tel" id="cust-phone" required></div>
-    <div class="input-group"><label>تابع لمن؟ (جهة / طرف)</label><input type="text" id="cust-referred" required></div>
-    <div class="input-group"><label>العنوان التفصيلي</label><input type="text" id="cust-address" required></div>
-
-    <div class="footer-cart">
-        <div>إجمالي الحساب: <span id="total-val" style="color: var(--accent-color); font-size: 1.2rem;">0</span> جنيه</div>
-        <button class="send-btn" id="send-btn" onclick="sendOrder()">إرسال الطلب 📧</button>
     </div>
 
     <!-- نافذة متابعة الطلبات للعميل -->
@@ -168,10 +145,33 @@
         </div>
     </div>
 
+    <!-- رأس الموقع (اضغط مطولاً أو انقر مرتين على كلمة "لُبّ - Labb" عشان تفتحلك شاشة الباسورد بتاعك) -->
+    <header>
+        <h1 onclick="triggerDevLogin()">لُبّ - Labb</h1>
+        <p>أسهل طريقة لطلب التسالي</p>
+    </header>
+
+    <div class="btn-group">
+        <button class="top-btn" onclick="openOrdersModal()">📦 متابعة طلباتي</button>
+    </div>
+
+    <!-- المنتجات -->
+    <div id="products-container">جاري تحميل المنتجات...</div>
+
+    <div style="color: var(--accent-color); font-weight: bold; margin: 15px 0 10px;">👤 بيانات التوصيل</div>
+    <div class="input-group"><label>الاسم بالكامل</label><input type="text" id="cust-name" required></div>
+    <div class="input-group"><label>رقم الهاتف</label><input type="tel" id="cust-phone" required></div>
+    <div class="input-group"><label>تابع لمن؟ (جهة / طرف)</label><input type="text" id="cust-referred" required></div>
+    <div class="input-group"><label>العنوان التفصيلي</label><input type="text" id="cust-address" required></div>
+
+    <div class="footer-cart">
+        <div>إجمالي الحساب: <span id="total-val" style="color: var(--accent-color); font-size: 1.2rem;">0</span> جنيه</div>
+        <button class="send-btn" onclick="sendOrder()">إرسال الطلب 📧</button>
+    </div>
+
     <script>
-        // --- 🔐 الحماية ---
-        const APP_PASSWORD = "01090"; // كلمة سر المتجر العامة
-        const ADMIN_PASSWORD = "Alhawe123"; // 🔑 كلمة سر لوحة التحكم
+        const APP_PASSWORD = "01090";       // باسورد دخول العملاء للموقع
+        const DEV_PASSWORD = "Alhawe123";   // باسورد المطور الخاص بك لتعديل الأسعار وإدارة الطلبات
 
         function checkPassword() {
             if (document.getElementById('app-pass-input').value === APP_PASSWORD) {
@@ -185,50 +185,59 @@
             document.getElementById('auth-overlay').style.display = 'none';
         }
 
-        /* --- 🔑 إعدادات Firebase السحابية --- */
-        const firebaseConfig = {
-            databaseURL: "https://labb-store-default-rtdb.firebaseio.com"
-        };
+        // إعدادات Firebase والـ EmailJS
+        const firebaseConfig = { databaseURL: "https://labb-store-default-rtdb.firebaseio.com" };
         firebase.initializeApp(firebaseConfig);
         const database = firebase.database();
-
-        // --- EmailJS ---
         emailjs.init("GmJXhbuFZa7wFxvn_");
 
-        const productsData = [
-            { name: "لب أسود", sizes: [{ name: "ربع كيلو", price: 30 }, { name: "نص كيلو", price: 60 }, { name: "كيلو كامل", price: 120 }] },
-            { name: "لب أصفر", sizes: [{ name: "ربع كيلو", price: 30 }, { name: "نص كيلو", price: 60 }, { name: "كيلو كامل", price: 120 }] },
-            { name: "لب أبيض فاخر", sizes: [{ name: "ربع كيلو", price: 40 }, { name: "نص كيلو", price: 80 }, { name: "كيلو كامل", price: 160 }] }
-        ];
-
         let cart = {};
+        let liveProductsData = {};
+
+        // جلب الأسعار والمنتجات الحية من قاعدة البيانات أول بأول
+        database.ref('products').on('value', snapshot => {
+            liveProductsData = snapshot.val();
+            if (!liveProductsData) {
+                // القيم الافتراضية لو الداتا بيز فاضية لأول مرة
+                liveProductsData = {
+                    "لب أسود": { "ربع كيلو": 30, "نص كيلو": 60, "كيلو كامل": 120 },
+                    "لب أصفر": { "ربع كيلو": 30, "نص كيلو": 60, "كيلو كامل": 120 },
+                    "لب أبيض فاخر": { "ربع كيلو": 40, "نص كيلو": 80, "كيلو كامل": 160 }
+                };
+                database.ref('products').set(liveProductsData);
+            }
+            renderProducts();
+        });
 
         function renderProducts() {
             const container = document.getElementById('products-container');
             container.innerHTML = '';
-            productsData.forEach((prod) => {
-                let html = `<div class="product-card"><div class="product-title">${prod.name}</div>`;
-                prod.sizes.forEach((sz) => {
-                    const key = `${prod.name} - ${sz.name}`;
+            for (let prodName in liveProductsData) {
+                let html = `<div class="product-card"><div class="product-title">${prodName}</div>`;
+                let sizes = liveProductsData[prodName];
+                for (let sizeName in sizes) {
+                    let price = sizes[sizeName];
+                    const key = `${prodName} - ${sizeName}`;
                     const qty = cart[key] ? cart[key].qty : 0;
                     html += `
                         <div class="size-row">
-                            <div>${sz.name} (${sz.price} ج)</div>
+                            <div>${sizeName} (${price} ج)</div>
                             <div class="qty-controls">
-                                <button class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, -1)">-</button>
+                                <button class="qty-btn" onclick="updateQty('${prodName}', '${sizeName}', ${price}, -1)">-</button>
                                 <span>${qty}</span>
-                                <button class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, 1)">+</button>
+                                <button class="qty-btn" onclick="updateQty('${prodName}', '${sizeName}', ${price}, 1)">+</button>
                             </div>
                         </div>`;
-                });
+                }
                 html += `</div>`;
                 container.innerHTML += html;
-            });
+            }
         }
 
         function updateQty(product, size, price, change) {
             const key = `${product} - ${size}`;
             if (!cart[key]) cart[key] = { product, size, price, qty: 0 };
+            cart[key].price = price; // تحديث السعر الحالي
             cart[key].qty += change;
             if (cart[key].qty <= 0) delete cart[key];
             let total = 0;
@@ -237,7 +246,7 @@
             renderProducts();
         }
 
-        // --- إرسال الطلب (مع التأكد من إدخال كافة البيانات الإجبارية) ---
+        // --- إرسال الطلب (مع التحقق من ملء البيانات) ---
         function sendOrder() {
             const name = document.getElementById('cust-name').value.trim();
             const phone = document.getElementById('cust-phone').value.trim();
@@ -248,9 +257,8 @@
                 alert('الرجاء اختيار المنتجات أولاً.');
                 return;
             }
-
             if (!name || !phone || !referred || !address) {
-                alert('الرجاء ملء جميع بيانات التوصيل (الاسم، رقم الهاتف، تابع لمن، والعنوان) قبل إرسال الطلب.');
+                alert('الرجاء ملء جميع بيانات التوصيل الإجبارية (الاسم، الهاتف، تابع لمن، والعنوان).');
                 return;
             }
 
@@ -264,41 +272,25 @@
             }
 
             const orderData = {
-                id: orderId,
-                name: name,
-                phone: phone,
-                referred: referred,
-                address: address,
-                items: itemsText,
-                total: `${total} جنيه`,
-                status: 'pending', // قيد الانتظار
+                id: orderId, name, phone, referred, address,
+                items: itemsText, total: `${total} جنيه`, status: 'pending',
                 date: new Date().toLocaleTimeString('ar-EG', { hour: '2-digit', minute: '2-digit' })
             };
 
-            // 1. حفظ الطلب في Firebase
             database.ref('orders/' + orderId).set(orderData);
 
-            // 2. حفظ رقم الطلب في متصفح العميل
             let myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
             myOrders.push(orderId);
             localStorage.setItem('my_orders', JSON.stringify(myOrders));
 
-            // 3. إرسال الإيميل إليك للتنبيه فقط
-            const templateParams = {
-                order_id: orderId,
-                cust_name: name,
-                cust_phone: phone,
-                cust_referred: referred,
-                cust_address: address,
-                order_items: itemsText,
-                total_price: `${total} جنيه`
-            };
-
-            emailjs.send("service_ofjx955", "template_6zol2ee", templateParams).then(() => {
-                alert(`تم إرسال طلبك بنجاح! رقم الطلب (${orderId}). يمكنك متابعة حالته من زر "متابعة طلباتي".`);
+            emailjs.send("service_ofjx955", "template_6zol2ee", {
+                order_id: orderId, cust_name: name, cust_phone: phone,
+                cust_referred: referred, cust_address: address,
+                order_items: itemsText, total_price: `${total} جنيه`
+            }).then(() => {
+                alert(`تم إرسال طلبك بنجاح! رقم الطلب (${orderId}).`);
                 cart = {};
                 renderProducts();
-                // تفريغ حقول البيانات بعد النجاح
                 document.getElementById('cust-name').value = '';
                 document.getElementById('cust-phone').value = '';
                 document.getElementById('cust-referred').value = '';
@@ -307,23 +299,16 @@
             });
         }
 
-        window.addEventListener('DOMContentLoaded', () => {
-            renderProducts();
-        });
-
-        // --- عرض حالة الطلبات للعميل ---
+        // --- متابعة طلبات العميل ---
         function openOrdersModal() {
             document.getElementById('orders-modal').style.display = 'flex';
             const container = document.getElementById('orders-list-container');
             const myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
-
             if (myOrders.length === 0) {
                 container.innerHTML = "لا يوجد لديك طلبات سابقة.";
                 return;
             }
-
-            container.innerHTML = "جاري التحقق من حالة الطلبات...";
-
+            container.innerHTML = "جاري التحقق...";
             let html = "";
             myOrders.forEach(id => {
                 database.ref('orders/' + id).once('value').then(snapshot => {
@@ -331,108 +316,105 @@
                     if (data) {
                         let statusTxt = "⏳ قيد الانتظار";
                         let statusClass = "status-pending";
+                        if (data.status === 'accepted') { statusTxt = "🟢 تم قبول الطلب"; statusClass = "status-accepted"; }
+                        else if (data.status === 'rejected') { statusTxt = "🔴 تم رفض الطلب"; statusClass = "status-rejected"; }
 
-                        if (data.status === 'accepted') {
-                            statusTxt = "🟢 تم قبول الطلب وتجهيزه";
-                            statusClass = "status-accepted";
-                        } else if (data.status === 'rejected') {
-                            statusTxt = "🔴 تم رفض الطلب";
-                            statusClass = "status-rejected";
-                        }
-
-                        html += `
-                            <div class="order-item-card">
-                                <div><b>رقم الطلب:</b> ${data.id}</div>
-                                <div><b>الوقت:</b> ${data.date}</div>
-                                <div><b>الإجمالي:</b> ${data.total}</div>
-                                <div style="margin-top:5px;"><b>حالة الطلب:</b> <span class="${statusClass}">${statusTxt}</span></div>
-                            </div>`;
+                        html += `<div class="order-item-card"><div><b>رقم الطلب:</b> ${data.id}</div><div><b>الإجمالي:</b> ${data.total}</div><div><b>الحالة:</b> <span class="${statusClass}">${statusTxt}</span></div></div>`;
                         container.innerHTML = html;
                     } else {
-                        html += `
-                            <div class="order-item-card">
-                                <div><b>رقم الطلب:</b> ${id}</div>
-                                <div style="margin-top:5px;"><b>حالة الطلب:</b> <span class="status-accepted">✨ تمت معالجة الطلب</span></div>
-                            </div>`;
+                        html += `<div class="order-item-card"><div><b>رقم الطلب:</b> ${id}</div><div><b>الحالة:</b> <span class="status-accepted">✨ تمت معالجة الطلب</span></div></div>`;
                         container.innerHTML = html;
                     }
                 });
             });
         }
+        function closeOrdersModal() { document.getElementById('orders-modal').style.display = 'none'; }
 
-        function closeOrdersModal() {
-            document.getElementById('orders-modal').style.display = 'none';
+        // --- 🛠️ لوحة تحكم المطور السرية والمدمجة ---
+        function triggerDevLogin() {
+            document.getElementById('dev-login-modal').style.display = 'flex';
         }
 
-        // --- ⚙️ لوحة تحكم الأدمن ---
-        function openAdminDashboard() {
-            if (sessionStorage.getItem('admin_authenticated') === 'true') {
-                loadAdminOrders();
+        function verifyDev() {
+            const pass = document.getElementById('dev-pass-input').value;
+            if (pass === DEV_PASSWORD) {
+                document.getElementById('dev-login-modal').style.display = 'none';
+                document.getElementById('dev-dashboard-modal').style.display = 'flex';
+                loadDevDashboard();
             } else {
-                document.getElementById('admin-login-modal').style.display = 'flex';
+                alert('كلمة سر المطور غير صحيحة!');
             }
         }
 
-        function verifyAdmin() {
-            const pass = document.getElementById('admin-pass-input').value;
-            if (pass === ADMIN_PASSWORD) {
-                sessionStorage.setItem('admin_authenticated', 'true');
-                document.getElementById('admin-login-modal').style.display = 'none';
-                loadAdminOrders();
-            } else {
-                alert('كلمة سر الأدمن غير صحيحة!');
+        function loadDevDashboard() {
+            // 1. تحميل خانات تعديل الأسعار
+            const pricesContainer = document.getElementById('prices-editor-container');
+            let pHtml = "";
+            for (let prodName in liveProductsData) {
+                pHtml += `<b>${prodName}</b><br>`;
+                for (let sizeName in liveProductsData[prodName]) {
+                    let val = liveProductsData[prodName][sizeName];
+                    pHtml += `<div style="display:flex; justify-content:space-between; align-items:center; margin:5px 0;">
+                        <span style="font-size:0.85rem; color:#aaa;">${sizeName}:</span>
+                        <input type="number" id="dev_price_${prodName}_${sizeName}" value="${val}" style="width:100px; padding:6px; background:#121212; border:1px solid #333; color:#fff; border-radius:6px; text-align:center;">
+                    </div>`;
+                }
+                pHtml += `<hr style="border-color:#333; margin:8px 0;">`;
             }
-        }
+            pricesContainer.innerHTML = pHtml;
 
-        function loadAdminOrders() {
-            document.getElementById('admin-orders-modal').style.display = 'flex';
-            const container = document.getElementById('admin-orders-container');
-            container.innerHTML = "جاري جلب الطلبات الواردة...";
-
-            database.ref('orders').once('value').then(snapshot => {
+            // 2. تحميل الطلبات الواردة لإدارتها
+            const ordersContainer = document.getElementById('dev-orders-container');
+            ordersContainer.innerHTML = "جاري تحميل الطلبات...";
+            database.ref('orders').on('value', snapshot => {
                 const orders = snapshot.val();
                 if (!orders) {
-                    container.innerHTML = "لا توجد طلبات جديدة حالياً.";
+                    ordersContainer.innerHTML = "لا توجد طلبات جديدة حالياً.";
                     return;
                 }
-
-                let html = "";
-                const keys = Object.keys(orders).reverse();
-                let activeOrdersCount = 0;
-
-                keys.forEach(key => {
-                    const ord = orders[key];
+                let oHtml = "";
+                let count = 0;
+                for (let id in orders) {
+                    let ord = orders[id];
                     if (ord.status === 'pending') {
-                        activeOrdersCount++;
-                        html += `
-                            <div class="order-item-card" id="order-card-${ord.id}">
+                        count++;
+                        oHtml += `
+                            <div class="order-item-card">
                                 <div><b>الرقم:</b> ${ord.id} | <b>الاسم:</b> ${ord.name}</div>
-                                <div><b>الهاتف:</b> ${ord.phone}</div>
-                                <div><b>العنوان:</b> ${ord.address}</div>
+                                <div><b>الهاتف:</b> ${ord.phone} | <b>العنوان:</b> ${ord.address}</div>
                                 <div><b>تابع لمن:</b> ${ord.referred}</div>
-                                <div style="background:#1a1a1a; padding:6px; border-radius:4px; margin:5px 0; white-space:pre-line;">${ord.items}</div>
+                                <div style="background:#121212; padding:5px; margin:5px 0; white-space:pre-line;">${ord.items}</div>
                                 <div><b>الإجمالي:</b> ${ord.total}</div>
                                 <div class="admin-action-btns">
-                                    <button class="btn-acc" onclick="handleOrderAction('${ord.id}', 'accepted')">✅ قبول</button>
-                                    <button class="btn-rej" onclick="handleOrderAction('${ord.id}', 'rejected')">❌ رفض</button>
+                                    <button class="btn-acc" onclick="devAction('${ord.id}', 'accepted')">قبول</button>
+                                    <button class="btn-rej" onclick="devAction('${ord.id}', 'rejected')">رفض</button>
                                 </div>
                             </div>`;
                     }
-                });
-
-                if (activeOrdersCount === 0) {
-                    container.innerHTML = "لا توجد طلبات جديدة حالياً.";
-                } else {
-                    container.innerHTML = html;
                 }
+                ordersContainer.innerHTML = count > 0 ? oHtml : "لا توجد طلبات قيد الانتظار حالياً.";
             });
         }
 
-        function handleOrderAction(orderId, actionType) {
+        function saveNewPrices() {
+            let updates = {};
+            for (let prodName in liveProductsData) {
+                for (let sizeName in liveProductsData[prodName]) {
+                    let input = document.getElementById(`dev_price_${prodName}_${sizeName}`);
+                    if (input) {
+                        updates[`${prodName}/${sizeName}`] = Number(input.value);
+                    }
+                }
+            }
+            database.ref('products').update(updates).then(() => {
+                alert('✨ تم تحديث الأسعار بنجاح، وظهرت لجميع العملاء فوراً!');
+            });
+        }
+
+        function devAction(orderId, actionType) {
             database.ref('orders/' + orderId).update({ status: actionType }).then(() => {
                 database.ref('orders/' + orderId).remove().then(() => {
-                    alert(`تم ${actionType === 'accepted' ? 'قبول' : 'رفض'} الطلب (${orderId}) وإزالته من القائمة بنجاح!`);
-                    loadAdminOrders();
+                    alert('تم تحديث الطلب بنجاح.');
                 });
             });
         }
