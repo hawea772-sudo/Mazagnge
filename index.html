@@ -171,7 +171,7 @@
     <script>
         // --- 🔐 الحماية ---
         const APP_PASSWORD = "01090"; // كلمة سر المتجر العامة
-        const ADMIN_PASSWORD = "Alhawe123"; // 🔑 كلمة سر لوحة التحكم الجديدة
+        const ADMIN_PASSWORD = "Alhawe123"; // 🔑 كلمة سر لوحة التحكم
 
         function checkPassword() {
             if (document.getElementById('app-pass-input').value === APP_PASSWORD) {
@@ -337,6 +337,14 @@
                                 <div style="margin-top:5px;"><b>حالة الطلب:</b> <span class="${statusClass}">${statusTxt}</span></div>
                             </div>`;
                         container.innerHTML = html;
+                    } else {
+                        // إذا تم مسحه من قاعدة البيانات بواسطة الأدمن، نظهر حالته الأخيرة للعميل
+                        html += `
+                            <div class="order-item-card">
+                                <div><b>رقم الطلب:</b> ${id}</div>
+                                <div style="margin-top:5px;"><b>حالة الطلب:</b> <span class="status-accepted">✨ تمت معالجة الطلب</span></div>
+                            </div>`;
+                        container.innerHTML = html;
                     }
                 });
             });
@@ -346,7 +354,7 @@
             document.getElementById('orders-modal').style.display = 'none';
         }
 
-        // --- ⚙️ لوحة تحكم الأدمن (التحكم السريع بضغطة زر) ---
+        // --- ⚙️ لوحة تحكم الأدمن ---
         function openAdminDashboard() {
             if (sessionStorage.getItem('admin_authenticated') === 'true') {
                 loadAdminOrders();
@@ -371,46 +379,55 @@
             const container = document.getElementById('admin-orders-container');
             container.innerHTML = "جاري جلب الطلبات الواردة...";
 
-            database.ref('orders').limitToLast(15).once('value').then(snapshot => {
+            database.ref('orders').once('value').then(snapshot => {
                 const orders = snapshot.val();
                 if (!orders) {
-                    container.innerHTML = "لا توجد طلبات مسجلة حتى الآن.";
+                    container.innerHTML = "لا توجد طلبات جديدة حالياً.";
                     return;
                 }
 
                 let html = "";
-                // عكس ترتيب الطلبات ليظهر الجديد في الأعلى
                 const keys = Object.keys(orders).reverse();
+                let activeOrdersCount = 0;
+
                 keys.forEach(key => {
                     const ord = orders[key];
-                    let currentStatus = "قيد الانتظار ⏳";
-                    if (ord.status === 'accepted') currentStatus = "مقبول 🟢";
-                    if (ord.status === 'rejected') currentStatus = "مرفوض 🔴";
-
-                    html += `
-                        <div class="order-item-card">
-                            <div><b>الرقم:</b> ${ord.id} | <b>الاسم:</b> ${ord.name}</div>
-                            <div><b>الهاتف:</b> ${ord.phone}</div>
-                            <div><b>العنوان:</b> ${ord.address}</div>
-                            <div><b>تابع لمن:</b> ${ord.referred}</div>
-                            <div style="background:#1a1a1a; padding:6px; border-radius:4px; margin:5px 0; white-space:pre-line;">${ord.items}</div>
-                            <div><b>الإجمالي:</b> ${ord.total}</div>
-                            <div><b>الحالة الحالية:</b> <b>${currentStatus}</b></div>
-                            <div class="admin-action-btns">
-                                <button class="btn-acc" onclick="updateOrderStatus('${ord.id}', 'accepted')">✅ قبول</button>
-                                <button class="btn-rej" onclick="updateOrderStatus('${ord.id}', 'rejected')">❌ رفض</button>
-                            </div>
-                        </div>`;
+                    // نعرض فقط الطلبات التي لم يتم الرد عليها بعد (pending)
+                    if (ord.status === 'pending') {
+                        activeOrdersCount++;
+                        html += `
+                            <div class="order-item-card" id="order-card-${ord.id}">
+                                <div><b>الرقم:</b> ${ord.id} | <b>الاسم:</b> ${ord.name}</div>
+                                <div><b>الهاتف:</b> ${ord.phone}</div>
+                                <div><b>العنوان:</b> ${ord.address}</div>
+                                <div><b>تابع لمن:</b> ${ord.referred}</div>
+                                <div style="background:#1a1a1a; padding:6px; border-radius:4px; margin:5px 0; white-space:pre-line;">${ord.items}</div>
+                                <div><b>الإجمالي:</b> ${ord.total}</div>
+                                <div class="admin-action-btns">
+                                    <button class="btn-acc" onclick="handleOrderAction('${ord.id}', 'accepted')">✅ قبول</button>
+                                    <button class="btn-rej" onclick="handleOrderAction('${ord.id}', 'rejected')">❌ رفض</button>
+                                </div>
+                            </div>`;
+                    }
                 });
-                container.innerHTML = html;
+
+                if (activeOrdersCount === 0) {
+                    container.innerHTML = "لا توجد طلبات جديدة حالياً.";
+                } else {
+                    container.innerHTML = html;
+                }
             });
         }
 
-        // تحديث حالة الطلب فوراً لتظهر للعميل في الحال
-        function updateOrderStatus(orderId, newStatus) {
-            database.ref('orders/' + orderId).update({ status: newStatus }).then(() => {
-                alert(`تم تحديث الطلب (${orderId}) بنجاح وظهر للعميل فوراً!`);
-                loadAdminOrders(); // تحديث القائمة أمامك
+        // عند الضغط على قبول أو رفض: تحديث الحالة وحذف الطلب من لوحة الأدمن (مع الاحتفاظ بنسخة العميل)
+        function handleOrderAction(orderId, actionType) {
+            // نحدث الحالة أولاً لكي يستطيع العميل رؤية النتيجة في "متابعة طلباتي"
+            database.ref('orders/' + orderId).update({ status: actionType }).then(() => {
+                // ثم نقوم بحذف الطلب من قاعدة البيانات لكي يختفي تماماً من أمامك وتظهر الطلبات التي تليه
+                database.ref('orders/' + orderId).remove().then(() => {
+                    alert(`تم ${actionType === 'accepted' ? 'قبول' : 'رفض'} الطلب (${orderId}) وإزالته من القائمة بنجاح!`);
+                    loadAdminOrders(); // إعادة تحميل القائمة لرؤية الطلب التالي
+                });
             });
         }
     </script>
