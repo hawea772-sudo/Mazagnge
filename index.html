@@ -3,12 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
-    <meta http-equiv="Pragma" content="no-cache">
-    <meta http-equiv="Expires" content="0">
     <title>لُبّ - Labb | أسهل طريقة لطلب التسالي</title>
     <meta name="theme-color" content="#121212">
-    <link rel="manifest" href="/manifest.json">
     <style>
         :root {
             --bg-color: #121212;
@@ -19,349 +15,86 @@
             --border-color: #333333;
         }
 
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            font-family: system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-        }
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: system-ui, -apple-system, sans-serif; }
 
         body {
-            background-color: var(--bg-color) !important;
-            color: var(--text-color) !important;
+            background-color: var(--bg-color);
+            color: var(--text-color);
             padding: 15px;
             max-width: 500px;
             margin: 0 auto;
             direction: rtl;
-            touch-action: manipulation;
-            -webkit-text-size-adjust: 100%;
         }
 
-        /* --- منع الزوم التلقائي --- */
-        input, select, textarea, button {
-            font-size: 16px !important;
-            touch-action: manipulation;
-        }
+        input, button { font-size: 16px !important; }
 
         /* --- شاشة الحماية بالباسورد --- */
         #auth-overlay {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: #121212;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 10000;
-            padding: 20px;
+            position: fixed; top: 0; left: 0; width: 100vw; height: 100vh;
+            background-color: #121212; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; z-index: 10000; padding: 20px;
         }
 
         .auth-card {
-            background: var(--card-bg);
-            padding: 25px 20px;
-            border-radius: 16px;
-            border: 1px solid var(--border-color);
-            width: 100%;
-            max-width: 320px;
-            text-align: center;
-            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
-        }
-
-        .auth-card h3 {
-            color: var(--accent-color);
-            margin-bottom: 10px;
-            font-size: 1.3rem;
-        }
-
-        .auth-card p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-bottom: 20px;
+            background: var(--card-bg); padding: 25px 20px; border-radius: 16px;
+            border: 1px solid var(--border-color); width: 100%; max-width: 320px; text-align: center;
         }
 
         .auth-card input {
-            width: 100%;
-            padding: 12px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-            background: #121212;
-            color: #fff;
-            text-align: center;
-            font-size: 1.2rem !important;
-            letter-spacing: 4px;
-            margin-bottom: 15px;
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--border-color);
+            background: #121212; color: #fff; text-align: center; font-size: 1.2rem !important; margin-bottom: 15px;
         }
 
         .auth-card button {
-            width: 100%;
-            padding: 12px;
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
+            width: 100%; padding: 12px; background: var(--accent-color); color: #000;
+            border: none; border-radius: 8px; font-weight: bold; cursor: pointer;
         }
 
-        #auth-error {
-            color: #e74c3c;
-            font-size: 0.85rem;
-            margin-top: 10px;
-            display: none;
+        header { text-align: center; padding: 15px 0; border-bottom: 1px solid var(--border-color); margin-bottom: 15px; }
+        header h1 { color: var(--accent-color); }
+
+        /* --- زر وسجل الطلبات --- */
+        .my-orders-btn {
+            width: 100%; padding: 10px; background: #2a2a2a; border: 1px solid var(--accent-color);
+            color: var(--accent-color); border-radius: 8px; font-weight: bold; margin-bottom: 15px; cursor: pointer;
         }
 
-        /* --- شاشة المقدمة --- */
-        #intro-screen {
-            position: fixed;
-            top: 0; left: 0;
-            width: 100vw; height: 100vh;
-            background-color: #0d0d0d;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            z-index: 9999;
-            transition: opacity 0.8s ease, visibility 0.8s;
+        .orders-modal {
+            display: none; position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.85); z-index: 10002; padding: 20px; justify-content: center; align-items: center;
         }
 
-        .intro-title-container {
-            display: flex;
-            align-items: center;
-            gap: 12px;
-            margin-bottom: 8px;
+        .orders-content {
+            background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 12px;
+            width: 100%; max-width: 400px; max-height: 80vh; overflow-y: auto; padding: 15px;
         }
 
-        .intro-main-text {
-            font-size: 2.2rem;
-            font-weight: 800;
-            background: linear-gradient(135deg, #f1c40f, #f39c12, #e67e22);
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            animation: pulseGlow 2s infinite ease-in-out;
+        .order-item-card {
+            background: #121212; border: 1px solid var(--border-color); padding: 12px;
+            border-radius: 8px; margin-bottom: 10px; font-size: 0.9rem;
         }
 
-        .intro-brand-text {
-            font-size: 1.6rem;
-            font-weight: bold;
-            color: #ffffff;
-            border-right: 2px solid var(--accent-color);
-            padding-right: 10px;
-        }
+        .status-pending { color: #f1c40f; font-weight: bold; }
+        .status-accepted { color: #2ecc71; font-weight: bold; }
+        .status-rejected { color: #e74c3c; font-weight: bold; }
 
-        .intro-subtext {
-            color: var(--text-secondary);
-            font-size: 0.95rem;
-            opacity: 0;
-            animation: fadeIn 1s forwards 0.5s;
-        }
-
-        @keyframes pulseGlow {
-            0%, 100% { opacity: 0.85; transform: scale(0.98); }
-            50% { opacity: 1; transform: scale(1.03); }
-        }
-
-        @keyframes fadeIn { to { opacity: 1; } }
-
-        /* --- شريط حالة المحل --- */
-        #shop-status-banner {
-            text-align: center;
-            padding: 10px;
-            font-weight: bold;
-            border-radius: 8px;
-            margin-bottom: 15px;
-            font-size: 0.95rem;
-            display: none;
-        }
-        .status-open { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
-        .status-closed { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
-
-        /* --- الهيدر --- */
-        header {
-            text-align: center;
-            padding: 15px 0;
-            border-bottom: 1px solid var(--border-color);
-            margin-bottom: 20px;
-            position: relative;
-        }
-
-        header h1 {
-            color: var(--accent-color);
-            font-size: 1.8rem;
-        }
-
-        header p {
-            color: var(--text-secondary);
-            font-size: 0.9rem;
-            margin-top: 5px;
-        }
-
-        /* --- المنتجات --- */
-        .product-card {
-            background: var(--card-bg);
-            border-radius: 12px;
-            padding: 15px;
-            margin-bottom: 15px;
-            border: 1px solid var(--border-color);
-        }
-
-        .product-title {
-            font-size: 1.2rem;
-            font-weight: bold;
-            margin-bottom: 12px;
-            color: #fff;
-        }
-
-        .size-row {
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 8px 0;
-            border-bottom: 1px solid #2a2a2a;
-        }
-
-        .size-row:last-child { border-bottom: none; }
-
-        .size-price {
-            color: var(--accent-color);
-            font-weight: bold;
-            font-size: 0.9rem;
-        }
-
-        .qty-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            background: #2a2a2a;
-            padding: 4px 8px;
-            border-radius: 8px;
-            border: 1px solid var(--border-color);
-        }
-
-        .qty-btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            width: 26px; height: 26px;
-            border-radius: 6px;
-            font-weight: bold;
-            font-size: 1.1rem;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center;
-        }
-
-        .qty-btn.minus { background: #444; color: #fff; }
-
-        .qty-count {
-            font-size: 1rem;
-            font-weight: bold;
-            min-width: 18px;
-            text-align: center;
-            color: #ffffff;
-        }
-
-        .section-title {
-            font-size: 1.1rem;
-            margin: 20px 0 10px 0;
-            display: flex; align-items: center; gap: 8px;
-            color: var(--accent-color);
-        }
-
+        /* --- باقي التنسيقات --- */
+        .product-card { background: var(--card-bg); border-radius: 12px; padding: 15px; margin-bottom: 15px; border: 1px solid var(--border-color); }
+        .product-title { font-size: 1.2rem; font-weight: bold; margin-bottom: 12px; }
+        .size-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid #2a2a2a; }
+        .qty-controls { display: flex; align-items: center; gap: 10px; background: #2a2a2a; padding: 4px 8px; border-radius: 8px; }
+        .qty-btn { background: var(--accent-color); color: #000; border: none; width: 26px; height: 26px; border-radius: 6px; font-weight: bold; cursor: pointer; }
         .input-group { margin-bottom: 12px; }
-
-        .input-group label {
-            display: block;
-            font-size: 0.85rem;
-            color: var(--text-secondary);
-            margin-bottom: 5px;
-        }
-
-        .input-group input {
-            width: 100%;
-            padding: 12px;
-            background: var(--card-bg);
-            border: 1px solid var(--border-color);
-            border-radius: 8px;
-            color: #fff;
-        }
-
-        .location-btn {
-            width: 100%;
-            padding: 12px;
-            background: transparent;
-            border: 1px dashed var(--accent-color);
-            color: var(--accent-color);
-            border-radius: 8px;
-            cursor: pointer;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-            margin-bottom: 15px;
-        }
-
-        .footer-cart {
-            position: sticky;
-            bottom: 10px;
-            background: var(--card-bg);
-            padding: 15px;
-            border-radius: 12px;
-            border: 1px solid var(--border-color);
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.5);
-            margin-top: 20px;
-        }
-
-        .total-price span {
-            color: var(--accent-color);
-            font-size: 1.3rem;
-        }
-
-        .send-btn {
-            background: var(--accent-color);
-            color: #000;
-            border: none;
-            padding: 12px 20px;
-            border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-        }
-
-        .send-btn:disabled {
-            background: #555;
-            color: #888;
-            cursor: not-allowed;
-        }
-
-        .modal {
-            display: none;
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.8);
-            justify-content: center; align-items: center;
-            z-index: 10001;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 20px;
-            border-radius: 12px;
-            max-width: 300px;
-            text-align: center;
-            border: 1px solid var(--border-color);
-        }
-
-        .modal-btn {
-            margin-top: 15px;
-            padding: 8px 20px;
-            background: var(--accent-color);
-            border: none;
-            border-radius: 6px;
-            color: #000;
-            font-weight: bold;
-            cursor: pointer;
-        }
+        .input-group label { display: block; font-size: 0.85rem; color: var(--text-secondary); margin-bottom: 5px; }
+        .input-group input { width: 100%; padding: 12px; background: var(--card-bg); border: 1px solid var(--border-color); border-radius: 8px; color: #fff; }
+        .footer-cart { position: sticky; bottom: 10px; background: var(--card-bg); padding: 15px; border-radius: 12px; border: 1px solid var(--border-color); display: flex; justify-content: space-between; align-items: center; }
+        .send-btn { background: var(--accent-color); color: #000; border: none; padding: 12px 20px; border-radius: 8px; font-weight: bold; cursor: pointer; }
     </style>
+
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/@emailjs/browser@3/dist/email.min.js"></script>
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-app.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/8.10.1/firebase-database.js"></script>
 </head>
 <body>
 
@@ -372,17 +105,7 @@
             <p>أدخل كلمة السر لدخول المتجر</p>
             <input type="password" id="app-pass-input" placeholder="****" maxlength="10">
             <button onclick="checkPassword()">دخول</button>
-            <p id="auth-error">كلمة السر غير صحيحة!</p>
         </div>
-    </div>
-
-    <!-- شاشة المقدمة -->
-    <div id="intro-screen">
-        <div class="intro-title-container">
-            <span class="intro-main-text">على كيفك</span>
-            <span class="intro-brand-text">mazagnge</span>
-        </div>
-        <p class="intro-subtext">أفضل تجربة لطلب التسالي ☕</p>
     </div>
 
     <header>
@@ -390,324 +113,225 @@
         <p>أسهل طريقة لطلب التسالي</p>
     </header>
 
-    <div id="shop-status-banner">جاري التحقق من حالة المحل...</div>
+    <!-- زر عرض طلباتي -->
+    <button class="my-orders-btn" onclick="openOrdersModal()">📦 متابعة طلباتي وموقفهما</button>
 
     <div id="products-container"></div>
 
-    <div class="section-title">👤 بيانات التوصيل</div>
-    
-    <div class="input-group">
-        <label for="cust-name">الاسم بالكامل</label>
-        <input type="text" id="cust-name" maxlength="50" placeholder="اكتب اسمك هنا..." autocomplete="name">
-    </div>
-
-    <div class="input-group">
-        <label for="cust-phone">رقم الهاتف</label>
-        <input type="tel" id="cust-phone" maxlength="15" placeholder="اكتب رقم الهاتف..." autocomplete="tel">
-    </div>
-
-    <!-- 👈 تم إضافة حقل تبع مين هنا -->
-    <div class="input-group">
-        <label for="cust-referred">تبع مين؟ (الجهة / اسم الشخص)</label>
-        <input type="text" id="cust-referred" maxlength="50" placeholder="جاي من طرف مين أو تبع جهة إيه؟">
-    </div>
-
-    <div class="input-group">
-        <label for="cust-address">العنوان التفصيلي</label>
-        <input type="text" id="cust-address" maxlength="150" placeholder="اسم الشارع - رقم العمارة - الدور" autocomplete="street-address">
-    </div>
-
-    <button class="location-btn" id="location-btn" onclick="getLocation()">📍 تحديد الموقع تلقائياً...</button>
+    <div style="color: var(--accent-color); font-weight: bold; margin: 15px 0 10px;">👤 بيانات التوصيل</div>
+    <div class="input-group"><label>الاسم بالكامل</label><input type="text" id="cust-name"></div>
+    <div class="input-group"><label>رقم الهاتف</label><input type="tel" id="cust-phone"></div>
+    <div class="input-group"><label>تابع لمن؟ (جهة / طرف)</label><input type="text" id="cust-referred"></div>
+    <div class="input-group"><label>العنوان التفصيلي</label><input type="text" id="cust-address"></div>
 
     <div class="footer-cart">
-        <div class="total-price">إجمالي الحساب: <br><span id="total-val">0</span> جنيه</div>
+        <div>إجمالي الحساب: <span id="total-val" style="color: var(--accent-color); font-size: 1.2rem;">0</span> جنيه</div>
         <button class="send-btn" id="send-btn" onclick="sendOrder()">إرسال الطلب 📧</button>
     </div>
 
-    <div class="modal" id="alert-modal">
-        <div class="modal-content">
-            <p id="modal-text">تنبيه</p>
-            <button class="modal-btn" onclick="closeModal()">إغلاق</button>
+    <!-- نافذة متابعة الطلبات للعميل -->
+    <div class="orders-modal" id="orders-modal">
+        <div class="orders-content">
+            <h3 style="color: var(--accent-color); margin-bottom: 15px;">قائمة طلباتك</h3>
+            <div id="orders-list-container">لا يوجد طلبات سابقة.</div>
+            <button onclick="closeOrdersModal()" style="margin-top: 15px; width: 100%; padding: 10px; background: var(--accent-color); border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">إغلاق</button>
         </div>
     </div>
 
     <script>
         // --- 🔐 كلمة السر ---
         const APP_PASSWORD = "01090";
-
         function checkPassword() {
-            const input = document.getElementById('app-pass-input').value;
-            const errorMsg = document.getElementById('auth-error');
-            
-            if (input === APP_PASSWORD) {
+            if (document.getElementById('app-pass-input').value === APP_PASSWORD) {
                 document.getElementById('auth-overlay').style.display = 'none';
                 sessionStorage.setItem('app_authenticated', 'true');
-            } else {
-                errorMsg.style.display = 'block';
             }
         }
-
-        // الضغط على Enter للدخول
-        document.getElementById('app-pass-input').addEventListener('keypress', function(e) {
-            if (e.key === 'Enter') {
-                checkPassword();
-            }
-        });
-
-        // عدم إعادة المطالبة بالكلمة إذا أدخلها المستخدم خلال نفس الجلسة
         if (sessionStorage.getItem('app_authenticated') === 'true') {
             document.getElementById('auth-overlay').style.display = 'none';
         }
 
-        // --- إعدادات EmailJS ---
-        const EMAILJS_PUBLIC_KEY = "GmJXhbuFZa7wFxvn_";
-        const EMAILJS_SERVICE_ID = "service_ofjx955";
-        const EMAILJS_TEMPLATE_ID = "template_6zol2ee"; 
+        // --- 🔑 إعدادات Firebase السحابية ---
+        const firebaseConfig = {
+            databaseURL: "https://labb-store-default-rtdb.firebaseio.com" // يمكنك إنشاء قاعدة بيانات مجانية على Firebase وحط رابطها هنا
+        };
+        firebase.initializeApp(firebaseConfig);
+        const database = firebase.database();
 
-        let isShopOpen = true;
-
-        (function() {
-            emailjs.init(EMAILJS_PUBLIC_KEY);
-        })();
-
-        window.addEventListener('DOMContentLoaded', () => {
-            setTimeout(() => {
-                const intro = document.getElementById('intro-screen');
-                if (intro) {
-                    intro.style.opacity = '0';
-                    intro.style.visibility = 'hidden';
-                }
-            }, 2200);
-            
-            checkShopStatus();
-            renderProducts();
-        });
-
-        async function checkShopStatus() {
-            const banner = document.getElementById('shop-status-banner');
-            const sendBtn = document.getElementById('send-btn');
-            
-            try {
-                const response = await fetch('./status.json?t=' + new Date().getTime(), { cache: 'no-store' });
-                const data = await response.json();
-                isShopOpen = data.isOpen;
-
-                banner.style.display = 'block';
-                if (isShopOpen) {
-                    banner.className = 'shop-status-banner status-open';
-                    banner.innerText = '🟢 المحل مفتوح ويستقبل طلباتكم الآن';
-                    sendBtn.disabled = false;
-                    sendBtn.innerText = 'إرسال الطلب 📧';
-                } else {
-                    banner.className = 'shop-status-banner status-closed';
-                    banner.innerText = '🔴 نعتذر، المحل مغلق مؤقتاً ولا نستقبل طلبات الآن';
-                    sendBtn.disabled = true;
-                    sendBtn.innerText = 'المحل مغلق حالياً ⛔';
-                }
-            } catch (e) {
-                banner.style.display = 'none';
-            }
-        }
+        // --- EmailJS ---
+        emailjs.init("GmJXhbuFZa7wFxvn_");
 
         const productsData = [
-            {
-                name: "لب أسود",
-                sizes: [
-                    { name: "ربع كيلو", price: 30 },
-                    { name: "نص كيلو", price: 60 },
-                    { name: "كيلو كامل", price: 120 }
-                ]
-            },
-            {
-                name: "لب أصفر",
-                sizes: [
-                    { name: "ربع كيلو", price: 30 },
-                    { name: "نص كيلو", price: 60 },
-                    { name: "كيلو كامل", price: 120 }
-                ]
-            },
-            {
-                name: "لب أبيض فاخر",
-                sizes: [
-                    { name: "ربع كيلو", price: 40 },
-                    { name: "نص كيلو", price: 80 },
-                    { name: "كيلو كامل", price: 160 }
-                ]
-            }
+            { name: "لب أسود", sizes: [{ name: "ربع كيلو", price: 30 }, { name: "نص كيلو", price: 60 }, { name: "كيلو كامل", price: 120 }] },
+            { name: "لب أصفر", sizes: [{ name: "ربع كيلو", price: 30 }, { name: "نص كيلو", price: 60 }, { name: "كيلو كامل", price: 120 }] },
+            { name: "لب أبيض فاخر", sizes: [{ name: "ربع كيلو", price: 40 }, { name: "نص كيلو", price: 80 }, { name: "كيلو كامل", price: 160 }] }
         ];
 
         let cart = {};
-        let userLocation = '';
-
-        function sanitizeInput(str) {
-            const temp = document.createElement('div');
-            temp.textContent = str;
-            return temp.innerHTML.trim();
-        }
 
         function renderProducts() {
             const container = document.getElementById('products-container');
             container.innerHTML = '';
-
-            productsData.forEach((prod, prodIdx) => {
-                let cardHtml = `
-                    <div class="product-card">
-                        <div class="product-title">${sanitizeInput(prod.name)}</div>
-                `;
-
-                prod.sizes.forEach((sz, szIdx) => {
+            productsData.forEach((prod, pIdx) => {
+                let html = `<div class="product-card"><div class="product-title">${prod.name}</div>`;
+                prod.sizes.forEach((sz, sIdx) => {
                     const key = `${prod.name} - ${sz.name}`;
-                    const currentQty = cart[key] ? cart[key].qty : 0;
-
-                    cardHtml += `
+                    const qty = cart[key] ? cart[key].qty : 0;
+                    html += `
                         <div class="size-row">
-                            <div class="size-info">${sanitizeInput(sz.name)} <span class="size-price">(${sz.price} ج)</span></div>
+                            <div>${sz.name} (${sz.price} ج)</div>
                             <div class="qty-controls">
-                                <button type="button" class="qty-btn minus" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, -1)">-</button>
-                                <span class="qty-count" id="qty-${prodIdx}-${szIdx}">${currentQty}</span>
-                                <button type="button" class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, 1)">+</button>
+                                <button class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, -1)">-</button>
+                                <span>${qty}</span>
+                                <button class="qty-btn" onclick="updateQty('${prod.name}', '${sz.name}', ${sz.price}, 1)">+</button>
                             </div>
-                        </div>
-                    `;
+                        </div>`;
                 });
-
-                cardHtml += `</div>`;
-                container.innerHTML += cardHtml;
+                html += `</div>`;
+                container.innerHTML += html;
             });
         }
 
         function updateQty(product, size, price, change) {
-            if (!isShopOpen) {
-                showAlert('المحل مغلق حالياً، لا يمكن إضافة منتجات للسلة.');
-                return;
-            }
-
             const key = `${product} - ${size}`;
-            
-            if (!cart[key]) {
-                cart[key] = { product, size, price, qty: 0 };
-            }
-
+            if (!cart[key]) cart[key] = { product, size, price, qty: 0 };
             cart[key].qty += change;
-
-            if (cart[key].qty <= 0) {
-                delete cart[key];
-            }
-
-            calculateTotal();
+            if (cart[key].qty <= 0) delete cart[key];
+            let total = 0;
+            for (let k in cart) total += cart[k].price * cart[k].qty;
+            document.getElementById('total-val').innerText = total;
             renderProducts();
         }
 
-        function calculateTotal() {
-            let total = 0;
-            for (let item in cart) {
-                total += cart[item].price * cart[item].qty;
-            }
-            document.getElementById('total-val').innerText = total;
-        }
-
-        function getLocation() {
-            if (!isShopOpen) return;
-            const btn = document.getElementById('location-btn');
-            btn.innerText = 'جاري تحديد الموقع...';
-
-            if (navigator.geolocation) {
-                navigator.geolocation.getCurrentPosition(
-                    (pos) => {
-                        const lat = pos.coords.latitude;
-                        const lng = pos.coords.longitude;
-                        userLocation = `https://maps.google.com/?q=${lat},${lng}`;
-                        btn.innerText = '✅ تم تحديد الموقع بنجاح!';
-                    },
-                    (err) => {
-                        showAlert('تعذر تحديد الموقع تلقائياً');
-                        btn.innerText = '📍 تحديد الموقع تلقائياً...';
-                    },
-                    { enableHighAccuracy: true, timeout: 10000 }
-                );
-            } else {
-                showAlert('متصفحك لا يدعم تحديد الموقع');
-            }
-        }
-
+        // --- إرسال الطلب وحفظه ---
         function sendOrder() {
-            if (!isShopOpen) {
-                showAlert('عذراً، المحل مغلق ولا يمكن إرسال الطلبات الآن.');
+            const name = document.getElementById('cust-name').value;
+            const phone = document.getElementById('cust-phone').value;
+            const referred = document.getElementById('cust-referred').value;
+            const address = document.getElementById('cust-address').value;
+
+            if (Object.keys(cart).length === 0 || !name) {
+                alert('الرجاء اختيار المنتجات وكتابة الاسم.');
                 return;
             }
 
-            const name = sanitizeInput(document.getElementById('cust-name').value);
-            const phone = sanitizeInput(document.getElementById('cust-phone').value);
-            const referredBy = sanitizeInput(document.getElementById('cust-referred').value);
-            const address = sanitizeInput(document.getElementById('cust-address').value);
-
-            if (Object.keys(cart).length === 0) {
-                showAlert('الرجاء اختيار صنف واحد على الأقل');
-                return;
-            }
-
-            if (!name) {
-                showAlert('الرجاء كتابة الاسم بالكامل');
-                return;
-            }
-
-            let fullAddress = address;
-            if (userLocation) {
-                fullAddress += fullAddress ? ` (${userLocation})` : userLocation;
-            }
-
+            const orderId = 'ORD-' + Math.floor(1000 + Math.random() * 9000);
             let itemsText = "";
-            let subtotal = 0;
-            for (let item in cart) {
-                const itemTotal = cart[item].price * cart[item].qty;
-                itemsText += `• ${cart[item].product} (${cart[item].size}) × ${cart[item].qty} = ${itemTotal} جنيه\n`;
-                subtotal += itemTotal;
+            let total = 0;
+            for (let k in cart) {
+                const sub = cart[k].price * cart[k].qty;
+                itemsText += `• ${cart[k].product} (${cart[k].size}) × ${cart[k].qty} = ${sub} ج\n`;
+                total += sub;
             }
 
-            const sendBtn = document.getElementById('send-btn');
-            sendBtn.innerText = "جاري الإرسال...";
-            sendBtn.disabled = true;
+            // رابط التحكم بالطلب من الجيميل
+            const siteUrl = window.location.href.split('?')[0];
+            const acceptUrl = `${siteUrl}?action=update_status&order_id=${orderId}&status=accepted`;
+            const rejectUrl = `${siteUrl}?action=update_status&order_id=${orderId}&status=rejected`;
 
-            // تم إضافة cust_referred هنا لتصلك في الإيميل
-            const templateParams = {
-                cust_name: name,
-                cust_phone: phone || 'غير مدخل',
-                cust_referred: referredBy || 'غير مدخل',
-                cust_address: fullAddress || 'غير مدخل',
-                order_items: itemsText,
-                total_price: `${subtotal} جنيه`
+            const orderData = {
+                id: orderId,
+                name: name,
+                phone: phone || 'غير مدخل',
+                referred: referred || 'غير مدخل',
+                address: address || 'غير مدخل',
+                items: itemsText,
+                total: `${total} جنيه`,
+                status: 'pending', // حالة مبدئية: قيد الانتظار
+                date: new Date().toLocaleString('ar-EG')
             };
 
-            emailjs.send(EMAILJS_SERVICE_ID, EMAILJS_TEMPLATE_ID, templateParams)
-                .then(function() {
-                    showAlert('تم إرسال طلبك بنجاح! شكراً لتسوقك من لُبّ.');
-                    cart = {};
-                    calculateTotal();
-                    renderProducts();
-                    document.getElementById('cust-name').value = '';
-                    document.getElementById('cust-phone').value = '';
-                    document.getElementById('cust-referred').value = '';
-                    document.getElementById('cust-address').value = '';
-                    sendBtn.innerText = "إرسال الطلب 📧";
-                    sendBtn.disabled = false;
-                }, function(error) {
-                    showAlert('حدث خطأ أثناء إرسال الطلب، يرجى المحاولة مرة أخرى.');
-                    sendBtn.innerText = "إرسال الطلب 📧";
-                    sendBtn.disabled = false;
+            // 1. حفظ الطلب في Firebase
+            database.ref('orders/' + orderId).set(orderData);
+
+            // 2. حفظ رقم الطلب في جهاز العميل
+            let myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+            myOrders.push(orderId);
+            localStorage.setItem('my_orders', JSON.stringify(myOrders));
+
+            // 3. إرسال الإيميل
+            const templateParams = {
+                order_id: orderId,
+                cust_name: name,
+                cust_phone: phone || 'غير مدخل',
+                cust_referred: referred || 'غير مدخل',
+                cust_address: address || 'غير مدخل',
+                order_items: itemsText,
+                total_price: `${total} جنيه`,
+                accept_url: acceptUrl,
+                reject_url: rejectUrl
+            };
+
+            emailjs.send("service_ofjx955", "template_6zol2ee", templateParams).then(() => {
+                alert(`تم إرسال طلبك بنجاح! رقم طلبك هو (${orderId}). يمكنك متابعة حالته من زر "طلباتي".`);
+                cart = {};
+                renderProducts();
+            });
+        }
+
+        // --- التحكم بحالة الطلب عند فتح الرابط من الإيميل ---
+        window.addEventListener('DOMContentLoaded', () => {
+            renderProducts();
+            const urlParams = new URLSearchParams(window.location.search);
+            const action = urlParams.get('action');
+            const orderId = urlParams.get('order_id');
+            const status = urlParams.get('status');
+
+            if (action === 'update_status' && orderId && status) {
+                database.ref('orders/' + orderId).update({ status: status }).then(() => {
+                    if (status === 'accepted') {
+                        alert(`✅ تم قبول الطلب رقم ${orderId} بنجاح!`);
+                    } else if (status === 'rejected') {
+                        alert(`❌ تم تغيير حالة الطلب رقم ${orderId} إلى "تم الرفض".`);
+                    }
                 });
+            }
+        });
+
+        // --- عرض قائمة طلبات العميل ---
+        function openOrdersModal() {
+            document.getElementById('orders-modal').style.display = 'flex';
+            const container = document.getElementById('orders-list-container');
+            const myOrders = JSON.parse(localStorage.getItem('my_orders') || '[]');
+
+            if (myOrders.length === 0) {
+                container.innerHTML = "لا توجد طلبات سابقة.";
+                return;
+            }
+
+            container.innerHTML = "جاري تحميل حالة الطلبات...";
+
+            let html = "";
+            myOrders.forEach(id => {
+                database.ref('orders/' + id).once('value').then(snapshot => {
+                    const data = snapshot.val();
+                    if (data) {
+                        let statusTxt = "⏳ قيد الانتظار";
+                        let statusClass = "status-pending";
+
+                        if (data.status === 'accepted') {
+                            statusTxt = "🟢 تم قبول الطلب وتجهيزه";
+                            statusClass = "status-accepted";
+                        } else if (data.status === 'rejected') {
+                            statusTxt = "🔴 تم رفض الطلب";
+                            statusClass = "status-rejected";
+                        }
+
+                        html += `
+                            <div class="order-item-card">
+                                <div><b>رقم الطلب:</b> ${data.id}</div>
+                                <div><b>التاريخ:</b> ${data.date}</div>
+                                <div><b>الإجمالي:</b> ${data.total}</div>
+                                <div style="margin-top:5px;"><b>الحالة:</b> <span class="${statusClass}">${statusTxt}</span></div>
+                            </div>`;
+                        container.innerHTML = html;
+                    }
+                });
+            });
         }
 
-        function showAlert(msg) {
-            document.getElementById('modal-text').innerText = msg;
-            document.getElementById('alert-modal').style.display = 'flex';
-        }
-
-        function closeModal() {
-            document.getElementById('alert-modal').style.display = 'none';
-        }
-
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('/sw.js').catch(() => {});
+        function closeOrdersModal() {
+            document.getElementById('orders-modal').style.display = 'none';
         }
     </script>
 </body>
