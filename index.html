@@ -37,10 +37,78 @@
             -webkit-text-size-adjust: 100%;
         }
 
-        /* --- منع الزوم التلقائي في الحقول والأزرار --- */
+        /* --- منع الزوم التلقائي --- */
         input, select, textarea, button {
             font-size: 16px !important;
             touch-action: manipulation;
+        }
+
+        /* --- شاشة الحماية بالباسورد --- */
+        #auth-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: #121212;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            z-index: 10000;
+            padding: 20px;
+        }
+
+        .auth-card {
+            background: var(--card-bg);
+            padding: 25px 20px;
+            border-radius: 16px;
+            border: 1px solid var(--border-color);
+            width: 100%;
+            max-width: 320px;
+            text-align: center;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.6);
+        }
+
+        .auth-card h3 {
+            color: var(--accent-color);
+            margin-bottom: 10px;
+            font-size: 1.3rem;
+        }
+
+        .auth-card p {
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            margin-bottom: 20px;
+        }
+
+        .auth-card input {
+            width: 100%;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border-color);
+            background: #121212;
+            color: #fff;
+            text-align: center;
+            font-size: 1.2rem !important;
+            letter-spacing: 4px;
+            margin-bottom: 15px;
+        }
+
+        .auth-card button {
+            width: 100%;
+            padding: 12px;
+            background: var(--accent-color);
+            color: #000;
+            border: none;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        #auth-error {
+            color: #e74c3c;
+            font-size: 0.85rem;
+            margin-top: 10px;
+            display: none;
         }
 
         /* --- شاشة المقدمة --- */
@@ -297,6 +365,18 @@
 </head>
 <body>
 
+    <!-- شاشة كلمة السر -->
+    <div id="auth-overlay">
+        <div class="auth-card">
+            <h3>🔒 التطبيق محمي</h3>
+            <p>أدخل كلمة السر لدخول المتجر</p>
+            <input type="password" id="app-pass-input" placeholder="****" maxlength="10">
+            <button onclick="checkPassword()">دخول</button>
+            <p id="auth-error">كلمة السر غير صحيحة!</p>
+        </div>
+    </div>
+
+    <!-- شاشة المقدمة -->
     <div id="intro-screen">
         <div class="intro-title-container">
             <span class="intro-main-text">على كيفك</span>
@@ -346,7 +426,34 @@
     </div>
 
     <script>
-        // إعدادات EmailJS المحدثة
+        // --- 🔐 كلمة السر الجديدة ---
+        const APP_PASSWORD = "01090";
+
+        function checkPassword() {
+            const input = document.getElementById('app-pass-input').value;
+            const errorMsg = document.getElementById('auth-error');
+            
+            if (input === APP_PASSWORD) {
+                document.getElementById('auth-overlay').style.display = 'none';
+                sessionStorage.setItem('app_authenticated', 'true');
+            } else {
+                errorMsg.style.display = 'block';
+            }
+        }
+
+        // الضغط على Enter للدخول
+        document.getElementById('app-pass-input').addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                checkPassword();
+            }
+        });
+
+        // عدم إعادة المطالبة بالكلمة إذا أدخلها المستخدم خلال نفس الجلسة
+        if (sessionStorage.getItem('app_authenticated') === 'true') {
+            document.getElementById('auth-overlay').style.display = 'none';
+        }
+
+        // --- إعدادات EmailJS ---
         const EMAILJS_PUBLIC_KEY = "GmJXhbuFZa7wFxvn_";
         const EMAILJS_SERVICE_ID = "service_ofjx955";
         const EMAILJS_TEMPLATE_ID = "template_6zol2ee"; 
