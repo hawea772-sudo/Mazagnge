@@ -149,10 +149,10 @@
     <div id="products-container"></div>
 
     <div style="color: var(--accent-color); font-weight: bold; margin: 15px 0 10px;">👤 بيانات التوصيل</div>
-    <div class="input-group"><label>الاسم بالكامل</label><input type="text" id="cust-name"></div>
-    <div class="input-group"><label>رقم الهاتف</label><input type="tel" id="cust-phone"></div>
-    <div class="input-group"><label>تابع لمن؟ (جهة / طرف)</label><input type="text" id="cust-referred"></div>
-    <div class="input-group"><label>العنوان التفصيلي</label><input type="text" id="cust-address"></div>
+    <div class="input-group"><label>الاسم بالكامل</label><input type="text" id="cust-name" required></div>
+    <div class="input-group"><label>رقم الهاتف</label><input type="tel" id="cust-phone" required></div>
+    <div class="input-group"><label>تابع لمن؟ (جهة / طرف)</label><input type="text" id="cust-referred" required></div>
+    <div class="input-group"><label>العنوان التفصيلي</label><input type="text" id="cust-address" required></div>
 
     <div class="footer-cart">
         <div>إجمالي الحساب: <span id="total-val" style="color: var(--accent-color); font-size: 1.2rem;">0</span> جنيه</div>
@@ -237,15 +237,20 @@
             renderProducts();
         }
 
-        // --- إرسال الطلب ---
+        // --- إرسال الطلب (مع التأكد من إدخال كافة البيانات الإجبارية) ---
         function sendOrder() {
-            const name = document.getElementById('cust-name').value;
-            const phone = document.getElementById('cust-phone').value;
-            const referred = document.getElementById('cust-referred').value;
-            const address = document.getElementById('cust-address').value;
+            const name = document.getElementById('cust-name').value.trim();
+            const phone = document.getElementById('cust-phone').value.trim();
+            const referred = document.getElementById('cust-referred').value.trim();
+            const address = document.getElementById('cust-address').value.trim();
 
-            if (Object.keys(cart).length === 0 || !name) {
-                alert('الرجاء اختيار المنتجات وكتابة الاسم.');
+            if (Object.keys(cart).length === 0) {
+                alert('الرجاء اختيار المنتجات أولاً.');
+                return;
+            }
+
+            if (!name || !phone || !referred || !address) {
+                alert('الرجاء ملء جميع بيانات التوصيل (الاسم، رقم الهاتف، تابع لمن، والعنوان) قبل إرسال الطلب.');
                 return;
             }
 
@@ -261,9 +266,9 @@
             const orderData = {
                 id: orderId,
                 name: name,
-                phone: phone || 'غير مدخل',
-                referred: referred || 'غير مدخل',
-                address: address || 'غير مدخل',
+                phone: phone,
+                referred: referred,
+                address: address,
                 items: itemsText,
                 total: `${total} جنيه`,
                 status: 'pending', // قيد الانتظار
@@ -282,9 +287,9 @@
             const templateParams = {
                 order_id: orderId,
                 cust_name: name,
-                cust_phone: phone || 'غير مدخل',
-                cust_referred: referred || 'غير مدخل',
-                cust_address: address || 'غير مدخل',
+                cust_phone: phone,
+                cust_referred: referred,
+                cust_address: address,
                 order_items: itemsText,
                 total_price: `${total} جنيه`
             };
@@ -293,6 +298,12 @@
                 alert(`تم إرسال طلبك بنجاح! رقم الطلب (${orderId}). يمكنك متابعة حالته من زر "متابعة طلباتي".`);
                 cart = {};
                 renderProducts();
+                // تفريغ حقول البيانات بعد النجاح
+                document.getElementById('cust-name').value = '';
+                document.getElementById('cust-phone').value = '';
+                document.getElementById('cust-referred').value = '';
+                document.getElementById('cust-address').value = '';
+                document.getElementById('total-val').innerText = '0';
             });
         }
 
@@ -338,7 +349,6 @@
                             </div>`;
                         container.innerHTML = html;
                     } else {
-                        // إذا تم مسحه من قاعدة البيانات بواسطة الأدمن، نظهر حالته الأخيرة للعميل
                         html += `
                             <div class="order-item-card">
                                 <div><b>رقم الطلب:</b> ${id}</div>
@@ -392,7 +402,6 @@
 
                 keys.forEach(key => {
                     const ord = orders[key];
-                    // نعرض فقط الطلبات التي لم يتم الرد عليها بعد (pending)
                     if (ord.status === 'pending') {
                         activeOrdersCount++;
                         html += `
@@ -419,14 +428,11 @@
             });
         }
 
-        // عند الضغط على قبول أو رفض: تحديث الحالة وحذف الطلب من لوحة الأدمن (مع الاحتفاظ بنسخة العميل)
         function handleOrderAction(orderId, actionType) {
-            // نحدث الحالة أولاً لكي يستطيع العميل رؤية النتيجة في "متابعة طلباتي"
             database.ref('orders/' + orderId).update({ status: actionType }).then(() => {
-                // ثم نقوم بحذف الطلب من قاعدة البيانات لكي يختفي تماماً من أمامك وتظهر الطلبات التي تليه
                 database.ref('orders/' + orderId).remove().then(() => {
                     alert(`تم ${actionType === 'accepted' ? 'قبول' : 'رفض'} الطلب (${orderId}) وإزالته من القائمة بنجاح!`);
-                    loadAdminOrders(); // إعادة تحميل القائمة لرؤية الطلب التالي
+                    loadAdminOrders();
                 });
             });
         }
